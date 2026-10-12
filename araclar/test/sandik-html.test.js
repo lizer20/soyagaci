@@ -326,7 +326,8 @@ test("genel başkanlar: yıl aralığı, görevde, bilinmeyen yıl, not ve eş b
   assert.match(h, /<b>Üçüncü<\/b><span><\/span>/);
   assert.match(h, /Dördüncü &lt;x&gt;<\/b><span>1970 – görevde<em class="p-bnot">vekil dönemi<\/em>/);
   assert.match(M.genelBaskanlarHTML("b", GB), /Eş genel başkanlar/);
-  assert.match(M.genelBaskanlarHTML("c", GB), /1966 – \?/);
+  assert.match(M.genelBaskanlarHTML("c", GB), /<span>1966'dan<\/span>/);
+  assert.doesNotMatch(M.genelBaskanlarHTML("c", GB), /\?/);
   assert.equal(M.genelBaskanlarHTML("yok", GB), "");
   assert.equal(M.genelBaskanlarHTML("a", undefined), "");
 });
@@ -361,4 +362,12 @@ test("pencerede bilinmeyen değerler yazılmaz: katılım, ittifak sandalyesi, b
   assert.match(h, /href="index\.html#akp">[^<]+<\/a><\/div>/);
   const tek = M.panelHTML(kayit("1927-09-genel"), F).html;
   assert.doesNotMatch(tek, /<th scope="col">Oy<\/th>|—/);
+});
+
+test("yıl ekleri okunuşa göre: 1955'ten, 1966'dan, 2002'ye, 1958'e, 1990'dan, 2000'e", () => {
+  const den = ["1955'ten", "1966'dan", "1983'ten", "1990'dan", "1997'den", "1998'den", "2010'dan", "1975'ten", "1991'den", "1992'den",
+    "2007'den", "1940'tan", "1960'tan", "1970'ten", "1980'den", "1920'den", "1930'dan", "1950'den", "2000'den", "1900'den", "1964'ten", "1969'dan"];
+  for (const x of den) assert.equal(M.yilEki(+x.slice(0, 4), "den"), x);
+  const e = ["1958'e", "2002'ye", "1993'e", "2009'a", "2025'e", "1966'ya", "1990'a", "1970'e", "2000'e", "1950'ye", "1961'e", "1940'a"];
+  for (const x of e) assert.equal(M.yilEki(+x.slice(0, 4), "e"), x);
 });

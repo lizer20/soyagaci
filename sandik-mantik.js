@@ -567,11 +567,24 @@
     }
 
     /* ---- soyağacı künyesi: genel başkanlar (GB = window.GENEL_BASKANLAR) ---- */
+    // yılın okunuşuna göre Türkçe ek: 1955'ten, 1958'e (yılın son sözcüğü: beş, sekiz, on, yüz, bin...)
+    function yilEki(yil, tur) {
+      const y = String(yil), son = +y.slice(-1), onlar = +y.slice(-2, -1);
+      const sozcuk = son ? ["", "bir", "iki", "üç", "dört", "beş", "altı", "yedi", "sekiz", "dokuz"][son]
+        : onlar ? ["", "on", "yirmi", "otuz", "kırk", "elli", "altmış", "yetmiş", "seksen", "doksan"][onlar]
+        : +y.slice(-3, -2) ? "yüz" : "bin";
+      const unlu = sozcuk.match(/[aeıioöuü]/g).pop(), kalin = /[aıou]/.test(unlu);
+      const sonHarf = sozcuk.slice(-1), unluyleBiter = /[aeıioöuü]/.test(sonHarf);
+      if (tur === "den") return y + "'" + (/[çfhkpsşt]/.test(sonHarf) ? "t" : "d") + (kalin ? "an" : "en");
+      return y + "'" + (unluyleBiter ? "y" : "") + (kalin ? "a" : "e");   // yönelme: 'e / 'ye / 'a / 'ya
+    }
     function genelBaskanlarHTML(id, GB) {
       const l = GB && GB[id];
       if (!l || !l.length) return "";
-      const yil = x => x.gorevde ? (x.bas || "?") + " – görevde"
-        : x.bas == null && x.bit == null ? "" : x.bas === x.bit ? x.bas : (x.bas || "?") + " – " + (x.bit || "?");
+      // bilinmeyen yıl "?" diye yazılmaz: yalnız başlangıç biliniyorsa "1955'ten", yalnız bitiş biliniyorsa "1958'e kadar"
+      const yil = x => x.gorevde ? (x.bas ? x.bas + " – görevde" : "görevde")
+        : x.bas == null && x.bit == null ? "" : x.bas === x.bit ? x.bas
+        : x.bit == null ? yilEki(x.bas, "den") : x.bas == null ? yilEki(x.bit, "e") + " kadar" : x.bas + " – " + x.bit;
       const satirlar = l.map(x => "<li><b>" + kacis(x.ad) + "</b><span>" + yil(x) +
         (x.not ? '<em class="p-bnot">' + kacis(x.not) + "</em>" : "") + "</span></li>");
       return liste(l.every(x => / ve /.test(x.ad)) ? "Eş genel başkanlar" : "Genel başkanlar", satirlar);
@@ -624,7 +637,7 @@
              donemBul, kronoloji, sonrakiHukumetler, partininSecimleri,
              kacis, rozetHTML, genelBaskanlarHTML, cubukHTML, meclisGruplari, meclisSVG, kartHTML, panelHTML, kunyeSecimleriHTML,
              kartMi, genisKartMi, yilGruplari, olayHTML, hukumetSatiriHTML,
-             birinciIller, haritaKunyeHTML };
+             birinciIller, haritaKunyeHTML, yilEki };
   }
   return { olustur };
 });
