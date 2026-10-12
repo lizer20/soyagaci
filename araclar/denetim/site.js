@@ -52,6 +52,8 @@ function bosIsaretler(secici) {
       if (bos.length) sorun.push(s + " (" + et + "): boş işaret " + JSON.stringify(bos.slice(0, 5)));
       if (EKRAN) {
         fs.mkdirSync(EKRAN, { recursive: true });
+        // Sandık'ta ekran dışı yıllar ancak görününce çizilir; tam boy görüntü için hepsi çizdirilir
+        await p.addStyleTag({ content: ".s-yil{content-visibility:visible!important}" });
         await p.screenshot({ path: path.join(EKRAN, s.replace(".html", "") + "-" + et + ".png"), fullPage: true });
       }
     }

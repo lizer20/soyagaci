@@ -34,6 +34,19 @@
         (satirlar.length ? '<div class="s-olaylar">' + satirlar.map(ogeHTML).join("") + "</div>" : "") + "</div></section>";
     }).join("");
   }
+  // Ekran dışındaki yıllar ekrana yaklaşınca çizildiği için (sandik.css: content-visibility) kaydırmadan
+  // sonra hedefin yeri birkaç piksel ya da ekranlarca kayabilir: kaydırma, hedef yerine oturana dek
+  // birkaç karede tekrarlanır.
+  function kaydir(el, blok) {
+    let hedef, kare = 0, sakin = 0;
+    const git = () => { el.scrollIntoView({ block: blok }); hedef = el.getBoundingClientRect().top; };
+    // yeni çizilen içerik birkaç kare sonra yerleşebilir: hedef 8 kare yerinde kalana dek (en çok ~1 sn) izlenir
+    const bak = () => requestAnimationFrame(() => {
+      if (Math.abs(el.getBoundingClientRect().top - hedef) > 1) { git(); sakin = 0; } else sakin++;
+      if (sakin < 8 && ++kare < 60) bak();
+    });
+    git(); bak();
+  }
   function bantBul(donem) { return rows.querySelector('.banner[aria-controls="' + donem.id + '"]'); }
 
   P.DONEMLER.forEach((d, i) => {
@@ -71,7 +84,7 @@
       e.preventDefault();   // adres çubuğundaki # seçim kimliği içindir, dönem için değiştirilmez
       const b = document.getElementById("bant-" + a.dataset.i), s = document.getElementById("donem-" + a.dataset.i);
       if (s.classList.contains("kapali")) O.bantDurum(b, s, false);
-      b.scrollIntoView({ block: "start" });
+      kaydir(b, "start");
     });
     if ("IntersectionObserver" in window) {
       const isaretle = i => atla.querySelectorAll("a").forEach(a => {
@@ -194,8 +207,8 @@
     const el = rows.querySelector('[data-id="' + id + '"]'); if (!el) return;
     const donem = el.closest(".s-donem");
     if (donem.classList.contains("kapali")) O.bantDurum(bantBul(donem), donem, false);
-    el.scrollIntoView({ block: "center" });
-    el.focus();
+    kaydir(el, "center");
+    el.focus({ preventScroll: true });
     ac(id);
   }
   window.addEventListener("hashchange", hashAc);

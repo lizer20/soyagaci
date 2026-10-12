@@ -30,7 +30,11 @@ const KARTLAR = [
     if (k.oge) await (await p.$(k.oge)).screenshot({ path: k.resim });
     else {
       // kaydirOge: o öğenin başı ekranın üstüne gelecek kadar kaydırılır (düzen değişse de aynı yer görünür)
-      if (k.kaydirOge) await p.evaluate(s => window.scrollTo(0, document.querySelector(s).getBoundingClientRect().top + scrollY - 8), k.kaydirOge);
+      // (Sandık'ta ekran dışı yıllar sonradan çizilir; yer oturana dek birkaç kez kaydırılır)
+      if (k.kaydirOge) for (let i = 0; i < 5; i++) {
+        await p.evaluate(s => window.scrollTo(0, document.querySelector(s).getBoundingClientRect().top + scrollY - 8), k.kaydirOge);
+        await p.waitForTimeout(150);
+      }
       else await p.evaluate(y => window.scrollTo(0, y), k.kaydir);
       await p.waitForTimeout(300); await p.screenshot({ path: k.resim });
     }

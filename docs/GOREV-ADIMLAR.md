@@ -35,10 +35,10 @@ Yapılmayacaklar (şimdilik): 1 (ana sitenin site haritası), 7 (genel başkan l
 
 ## İlerleme
 
-- [ ] 10 README
-- [ ] 11 Site denetim aracı
-- [ ] 12 Otomatik test
-- [ ] 13 Hızlı açılış
+- [x] 10 README
+- [x] 11 Site denetim aracı (`araclar/denetim/site.js`, ~1,5 dk)
+- [x] 12 Otomatik test (`.github/workflows/denetim.yml`; ilk iki çalıştırma yeşil)
+- [x] 13 Hızlı açılış (`content-visibility` + `kaydir()`; 4x yavaş işlemcide açılış 966→~600 ms, donma 618→~250 ms)
 - [ ] 3 Hükümet penceresi
 - [ ] 4 Sandık'ta arama
 - [ ] 5 Hükümette geçen süre

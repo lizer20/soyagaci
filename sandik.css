@@ -27,7 +27,13 @@
 .s-kap{border:1px dashed #7A1509;padding:12px 12px 0;margin:-6px 0 16px;background:rgba(122,21,9,.025)}
 
 /* ---- yıl çizelgesi: solda yıl, sağda o yılın kartları ve satırları ---- */
-.s-yil{display:grid;grid-template-columns:62px minmax(0,1fr);column-gap:18px}
+.s-yil{display:grid;grid-template-columns:62px minmax(0,1fr);column-gap:18px;
+  /* ekran dışındaki yıllar ekrana yaklaşınca yerleştirilip çizilir (açılışı hızlandırır); boyut ilk
+     çizimden sonra hatırlanır */
+  content-visibility:auto;contain-intrinsic-size:auto 240px;
+  /* görünürlük sınırı kutuyu kırpar: kart üstüne gelince kalkma ve klavye odak çerçevesi kırpılmasın
+     diye kutu her yandan biraz genişletildi (iç düzen aynı yerde kalır) */
+  padding:4px 6px 0;margin:-4px -6px 0}
 .s-yil-no{
   margin:0;padding:9px 14px 0 0;text-align:right;position:relative;
   font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:14px;line-height:1;letter-spacing:.03em;
@@ -241,3 +247,5 @@
 }
 /* araç çubuğu: üstte tür düğmeleri, altta yıl kaydırıcısı ve temizle */
 #turlar{flex:1 1 100%}
+/* yazdırırken bütün yıllar çizilir */
+@media print{.s-yil{content-visibility:visible}}
