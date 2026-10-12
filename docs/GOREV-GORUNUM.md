@@ -31,8 +31,63 @@
 - [x] 0. Görev kaydı (bu dosya)
 - [x] 1. Mevcut durum taraması (ekran görüntüleri: masaüstü + telefon, dört sayfa)
 - [x] 2. Sandık: boş veri gizleme (kartta/pencerede "—", "veri yok", "katılım —", boş satır/sütun yok)
-- [~] 3. Sandık: görsel düzen — yıl çizelgesi, hizalı satırlar (hükümet, TBMM CB, ara, ayrıntısız yerel), kartlar yenilendi; ince ayar sürüyor
-- [ ] 4. Soyağacı, harita, kaynakça: okunabilirlik düzeltmeleri
-- [ ] 5. Optimizasyon (yükleme, çizim, mobil)
-- [ ] 6. Son denetim (testler, doğrulama, ekran görüntüleri, file://)
-- [ ] 7. Değişiklik listesi kullanıcıya
+- [x] 3. Sandık: görsel düzen (yıl çizelgesi, hizalı satırlar, yeni kartlar, dönem çubuğu)
+- [x] 4. Soyağacı, harita, kaynakça: okunabilirlik düzeltmeleri
+- [x] 5. Optimizasyon (yazı tipleri inceltildi, harita verisi sonradan yükleniyor)
+- [x] 6. Son denetim (93/93 test, dogrula "hata yok", 181 iç bağlantı sağlam, 85 Sandık + 94 parti
+      penceresi ve 40 harita tablosunda "—"/"?" yok, file:// üzerinde konsol hatası yok)
+- [x] 7. Değişiklik listesi kullanıcıya (aşağıda)
+
+**Durum (12 Ekim 2026):** her şey `claude/elegant-tesla-uaepdv` dalında; **`main`'e alınmadı**.
+Kullanıcı onay verince: `git push origin HEAD:main` (yayın). Onay öncesi önizleme için dal
+indirilip `index.html` / `sandik.html` çift tıklamayla açılabilir.
+
+## Değişiklik listesi (kullanıcıya verilen)
+
+**Sandık**
+1. Yeni düzen: her dönem bandında solda yıl çizgisi; o yılın seçimleri ve hükümetleri yılın yanında.
+2. Ayrıntılı sonucu olan seçimler kart; hükümetler, TBMM'deki cumhurbaşkanlığı seçimleri, ara seçimler
+   ve ülke geneli sonucu bulunamayan yerel seçimler sütunları hizalı tek satır.
+3. Hükümet satırı: başlangıç tarihi · numara · (yaygın adı) · başbakan · partiler · bitiş tarihi ve nedeni.
+   Öne çıkan hükümetler (İlk koalisyon, Milliyetçi Cephe, ANAYOL, ANASOL-D…) büyük yazılı.
+4. Boş veri gizlendi: "—", "veri yok", "oy dağılımı kayıtlı değil", "katılım —", "dağılımı bilinmeyen"
+   satırı, hiç oyu bilinmeyen seçimde "oy" sütunu ve çubuğu, boş "Bağımsızlar" satırı, ittifak
+   listelerindeki "—" sandalyeler artık görünmüyor (bilinenler aynen duruyor).
+5. Kartlar: genel seçimde 5 partiye kadar sandalye/oy listesi ve altta katılım · baraj · baraj altı;
+   yerel seçime "… birinci parti" başlığı, renkli ilk üç, belediye başkanlıkları ve büyükşehirler;
+   referandumda Evet/Hayır yüzdeleri çubuğun üstünde; cumhurbaşkanlığında turlar ve adaylar.
+   Tek partili meclis kartları dar ve kısa.
+6. Üstte kaydırırken sabit kalan dönem çubuğu (1923–1945 … 2016–2026), okunan dönem işaretli.
+7. Tür düğmelerinde kayıt sayıları (Genel 27, Yerel 21, … Hükümet 67).
+8. Pencerede: uzun başlık kapatma düğmesinin altına kaymıyor; gri başlıklar koyu; adaylar
+   alt alta (aday, destekleyen parti, oy); hükümet listesi yeni satır biçiminde; katılım
+   bilinmiyorsa yazılmıyor; oy oranı yoksa oy sayısı tek başına yazılıyor.
+
+**Soyağacı**
+9. Arama kutusu genişledi (yazı kesilmiyor).
+10. Parti penceresinde bilinmeyen yıl "?" yerine "1955'ten", "1958'e kadar"; bilinmeyen oy/sandalye
+    yazılmıyor; 2015'teki iki seçim "Haz 2015 genel", "Kas 2015 genel" diye ayrılıyor.
+
+**Harita**
+11. İl il sonuç tablosunda sonucu bilinmeyen il satırı ve hiç dolu olmayan sütun gösterilmiyor
+    (362 "—" hücresi kalktı).
+
+**Kaynakça**
+12. Sağda (telefonda başta) "bu sayfada" içindekiler listesi.
+13. "—" işareti açıklaması yeni kurala göre yazıldı; "İl il harita henüz yoktur" eski cümlesi düzeltildi.
+
+**Bütün site**
+14. Yazı tipi dosyası küçüldü (399 KB → 293 KB; sıkıştırılmış 297 KB → 216 KB), görünüm aynı.
+15. Sandık'ta harita verisi sayfa çizildikten sonra, soyağacında parti penceresi açılınca yükleniyor.
+16. Alt bilgi bağlantıları mavi değil, tema renginde; "filtreleri temizle" düğmesinde üzerine
+    gelince yazının kaybolması düzeltildi.
+17. Paylaşım görselleri yeni Sandık düzeninden yeniden üretildi.
+
+## Yeni oturum için teknik not
+
+- `sandik-mantik.js`: yeni `kartMi`, `genisKartMi`, `yilGruplari`, `olayHTML`, `hukumetSatiriHTML`,
+  `yilEki`; `seritHTML` kaldırıldı (yerine `hukumetSatiriHTML`). `cubukHTML` değer yoksa "" döner.
+- `sandik-sayfa.js`: yıl grupları (`.s-yil` > `.s-kartlar` + `.s-olaylar`), tıklanabilir öğe sınıfı
+  `.s-ac`, dönem çubuğu `#atla`, harita verisi `Ortak.betikYukle` ile.
+- `ortak.js`: `betikYukle(src)` (file:// uyumlu, <script> ile).
+- `araclar/font-incelt.py`: ortak.css'teki gömülü yazı tiplerini incelten betik (fonttools gerekir).

@@ -34,6 +34,11 @@ Bu dosya, projenin bir sohbetten başka bir sohbete aktarılması için yazıld�
 > çelişkisi, 1963/1968 yerel ülke geneli, 1963–1977 büyükşehirler, 1984–2024 yerel ülke geneli (kullanıcı kararı:
 > resmî YSK ilanı yeterli), 1961 referandumu ham sayıları. Testler 77/77.
 
+> **Güncelleme (12 Ekim 2026) — görünüm ve okunabilirlik turu:** kullanıcı isteği ve yapılanların
+> tamamı `docs/GOREV-GORUNUM.md`'de. Sandık yeni düzende (yıl çizelgesi, hizalı satırlar, boş veri
+> gizli); yazı tipleri inceltildi; harita verisi sonradan yükleniyor. **Dalda bekliyor, `main`'e
+> kullanıcı onayından sonra alınacak.** Testler 93/93.
+
 ---
 
 ## 1. Projenin ne olduğu
