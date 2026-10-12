@@ -4,7 +4,7 @@
   const r = {};
   const ogeId = x => { const k = x.querySelector("[data-id]"); return k ? k.dataset.id : "serit"; };
   r.kart = document.querySelectorAll(".s-kart").length;
-  r.serit = document.querySelectorAll(".s-serit").length;
+  r.serit = document.querySelectorAll(".s-hukumet").length;
   r.bant = document.querySelectorAll(".banner:not(.kesinti)").length;
   r.kesinti = document.querySelectorAll(".banner.kesinti").length;
   r.bos = document.querySelectorAll(".s-bos").length;

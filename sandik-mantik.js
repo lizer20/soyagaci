@@ -133,11 +133,10 @@
     function cubukHTML(bolutler, etiket) {
       const b = bolutler.filter(x => x.deger != null && x.deger > 0);
       if (!b.length) {
-        // değerler bilinip hepsi 0 ise "veri yok" demek yanlış olur: boş çubuk çizilir
+        // değerler bilinip hepsi 0 ise boş çubuk çizilir; hiç değer yoksa çubuk hiç çizilmez
         const sifir = bolutler.filter(x => x.deger === 0);
         return sifir.length ? '<div class="cubuk" role="img" aria-label="' + kacis(etiket + ": " +
-          sifir.map(x => x.kisa + " " + O.yuzdeYaz(0)).join(", ")) + '"></div>'
-          : '<div class="cubuk-yok">veri yok</div>';
+          sifir.map(x => x.kisa + " " + O.yuzdeYaz(0)).join(", ")) + '"></div>' : "";
       }
       const aria = etiket + ": " + b.map(x => x.kisa + " " + O.yuzdeYaz(x.deger)).join(", ");
       return '<div class="cubuk" role="img" aria-label="' + kacis(aria) + '">' +
@@ -178,12 +177,23 @@
     }
     function ilkUcHTML(k, satirlar, sandalyeli) {
       // Sıralama oya (gerekirse sandalyeye) dayanır; ikisi de bilinmiyorsa liste sırası
-      // sıralama sanılmasın diye ilk üç hiç gösterilmez.
+      // sıralama sanılmasın diye ilk üç hiç gösterilmez. Bilinmeyen değer yazılmaz.
       const olculebilir = satirlar.some(s => oyDegeri(s, k) != null || (sandalyeli && s.sandalye != null));
-      if (!olculebilir) return '<div class="s-not">sıralama bilinmiyor</div>';
-      return '<ol class="s-ilk3">' + satirlar.slice(0, 3).map(s =>
-        "<li><b>" + kacis(partiAdi(s).kisa) + "</b> " + O.yuzdeYaz(oyDegeri(s, k)) +
-        (sandalyeli ? " · " + O.sayiYaz(s.sandalye) : "") + "</li>").join("") + "</ol>";
+      if (!olculebilir) return "";
+      return '<ol class="s-ilk3">' + satirlar.slice(0, 3).map(s => {
+        const a = partiAdi(s), y = oyDegeri(s, k);
+        const deger = [y != null ? O.yuzdeYaz(y) : null,
+          sandalyeli && s.sandalye != null ? O.sayiYaz(s.sandalye) + " sandalye" : null].filter(Boolean).join(" · ");
+        return '<li><i style="background:' + a.renk + '"></i><b>' + kacis(a.kisa) + "</b>" +
+          (deger ? "<span>" + deger + "</span>" : "") + "</li>";
+      }).join("") + "</ol>";
+    }
+    // bir satır dizisinde en az bir oy değeri biliniyor mu
+    function oyVarMi(k, satirlar) { return (satirlar || []).some(s => oyDegeri(s, k) != null); }
+    // kart altındaki künye satırı: yalnız bilinen parçalar yazılır
+    function kunyeSatiri(parcalar) {
+      const p = parcalar.filter(Boolean);
+      return p.length ? '<div class="s-kunye">' + p.join('<span class="s-ayrac">·</span>') + "</div>" : "";
     }
 
     /* ---- meclis yarım dairesi: her nokta bir sandalye. Yerleşim temsilîdir, gerçek oturma
@@ -280,98 +290,187 @@
         (buyuk ? '<text class="m-alt" x="0" y="-1" text-anchor="middle">sandalye</text>' : "") + "</svg>";
     }
     function koltukListesiHTML(k) {
-      const g = meclisGruplari(k);
-      const goster = g.length > 4 ? g.slice(0, 3) : g, artan = g.slice(goster.length);
-      const oy = x => x.satir ? O.yuzdeYaz(oyDegeri(x.satir, k)) : "";
-      return '<ol class="s-koltuk"><li class="s-kb"><span></span><span>sandalye</span><span>oy</span></li>' +
-        goster.map(x => '<li><b><i style="' + (x.renk ? "background:" + x.renk : "") + '"' + (x.renk ? "" : ' class="bos"') + "></i>" +
-          kacis(x.kisa) + "</b><span>" + O.sayiYaz(x.sandalye) + "</span><span>" + oy(x) + "</span></li>").join("") +
-        (artan.length ? '<li class="s-artan"><b>+' + artan.length + " daha</b><span>" +
-          O.sayiYaz(artan.reduce((t, x) => t + x.sandalye, 0)) + "</span><span></span></li>" : "") + "</ol>";
+      // dağılımı bilinmeyen sandalyeler listede satır olmaz; çizimde boş halka, pencerede açıklama olarak durur
+      const g = meclisGruplari(k).filter(x => x.renk);
+      const goster = g.length > 6 ? g.slice(0, 5) : g, artan = g.slice(goster.length);
+      const oyVar = g.some(x => x.satir && oyDegeri(x.satir, k) != null);
+      const oy = x => {
+        if (!oyVar) return "";
+        const y = x.satir ? oyDegeri(x.satir, k) : null;
+        return "<span>" + (y != null ? O.yuzdeYaz(y) : "") + "</span>";
+      };
+      return '<ol class="s-koltuk' + (oyVar ? "" : " s-oysuz") + '"><li class="s-kb"><span></span><span>sandalye</span>' +
+        (oyVar ? "<span>oy</span>" : "") + "</li>" +
+        goster.map(x => '<li><b><i style="background:' + x.renk + '"></i>' + kacis(x.kisa) + "</b><span>" +
+          O.sayiYaz(x.sandalye) + "</span>" + oy(x) + "</li>").join("") +
+        (artan.length ? '<li class="s-artan"><b>+' + artan.length + " parti daha</b><span>" +
+          O.sayiYaz(artan.reduce((t, x) => t + x.sandalye, 0)) + "</span>" + (oyVar ? "<span></span>" : "") + "</li>" : "") + "</ol>";
     }
 
+    function oySirali(k, satirlar) {
+      return satirlar.slice().sort((a, b) => (oyDegeri(b, k) || 0) - (oyDegeri(a, k) || 0));
+    }
+    function sehirlerHTML(k) {
+      if (!k.buyuksehir) return "";
+      const l = SEHIRLER.filter(x => k.buyuksehir[x[0]]).map(x => {
+        const b = k.buyuksehir[x[0]], a = partiAdi(b);
+        return '<span class="s-sehir"' + (b.dipnot ? ' title="' + kacis(b.dipnot) + '"' : "") + ">" + x[1] +
+          ' <i style="background:' + a.renk + '"></i><b>' + kacis(a.kisa) + "</b></span>";
+      });
+      return l.length ? '<div class="s-sehirler">' + l.join("") + "</div>" : "";
+    }
     function kartHTML(k) {
       let govde = "";
       if (k.tur === "genel") {
         govde = '<div class="s-baslik">' + kacis(baslikGenel(k)) + "</div>";
-        const oyCubugu = k.tekParti ? "" : '<div class="s-oycubuk"><span>oy</span>' + cubukHTML(oyBolutleri(k, k.sonuc), "oy") + "</div>";
-        const alt = meclisDurumu(k).giremeyenler.slice().sort((a, b) => (oyDegeri(b, k) || 0) - (oyDegeri(a, k) || 0))[0];
-        const baraj = !k.tekParti && k.baraj != null && alt
-          ? '<div class="s-baraj">baraj altı: ' + kacis(partiAdi(alt).kisa) + " " + O.yuzdeYaz(oyDegeri(alt, k)) + "</div>" : "";
+        const oyVar = !k.tekParti && oyVarMi(k, k.sonuc);
+        const oyCubugu = oyVar ? '<div class="s-oycubuk"><span>oy</span>' + cubukHTML(oyBolutleri(k, k.sonuc), "oy") + "</div>" : "";
+        const alt = oySirali(k, meclisDurumu(k).giremeyenler)[0];
+        const altOy = alt ? oyDegeri(alt, k) : null;
+        const kunye = kunyeSatiri([
+          katilimDegeri(k) != null ? "katılım " + O.yuzdeYaz(katilimDegeri(k)) : null,
+          !k.tekParti && k.baraj != null ? "baraj %" + k.baraj : null,
+          !k.tekParti && k.baraj != null && alt && altOy != null
+            ? '<span class="s-baraj">baraj altı: ' + kacis(partiAdi(alt).kisa) + " " + O.yuzdeYaz(altOy) + "</span>" : null]);
         if (meclisGruplari(k).length)
           govde += '<div class="s-meclis"><div class="s-sol">' + meclisSVG(k, false) + oyCubugu + '</div><div class="s-sag">' +
-            koltukListesiHTML(k) + baraj + "</div></div>";
-        else if (!k.tekParti)   // sandalye dağılımı bilinmiyor: yalnız oy
-          govde += oyCubugu + ilkUcHTML(k, siralaGenel(k), true) + baraj;
+            koltukListesiHTML(k) + "</div></div>" + kunye;
+        else if (oyVar)   // sandalye dağılımı bilinmiyor: yalnız oy
+          govde += oyCubugu + ilkUcHTML(k, siralaGenel(k), true) + kunye;
+        else govde += kunye;
       } else if (k.tur === "yerel") {
-        const partiler = (k.sonuc || []).filter(s => s.ad !== DIGER);
-        const olculebilir = partiler.some(s => oyDegeri(s, k) != null);
-        govde = olculebilir ? cubukHTML(oyBolutleri(k, k.sonuc || []), "oy") +
-          ilkUcHTML(k, partiler.slice().sort((a, b) => (oyDegeri(b, k) || 0) - (oyDegeri(a, k) || 0)), false)
-          : '<div class="s-not">' + (k.kapsam ? "yalnız " + kacis(k.kapsam) : "oy dağılımı kayıtlı değil") + "</div>";
-        if (k.belediye) govde += '<div class="s-baskanlik">başkanlık · ' + k.belediye.sonuc.filter(x => x.ad !== BAGIMSIZ).slice(0, 3)
-          .map(x => "<b>" + kacis(partiAdi(x).kisa) + "</b> " + O.sayiYaz(x.sayi)).join(" · ") + "</div>";
-        if (k.buyuksehir) govde += '<div class="s-sehirler">' + SEHIRLER.filter(x => k.buyuksehir[x[0]])
-          .map(x => x[1] + " · <b>" + kacis(partiAdi(k.buyuksehir[x[0]]).kisa) + "</b>" +
-            (k.buyuksehir[x[0]].dipnot ? " (" + kacis(k.buyuksehir[x[0]].dipnot) + ")" : "")).join("<br>") + "</div>";
+        const partiler = (k.sonuc || []).filter(s => !ozelSatir(s));
+        if (oyVarMi(k, partiler)) {
+          const sirali = oySirali(k, partiler);
+          govde = '<div class="s-baslik">' + kacis(partiAdi(sirali[0]).kisa) + " birinci parti</div>" +
+            cubukHTML(oyBolutleri(k, k.sonuc || []), "oy") + ilkUcHTML(k, sirali, false);
+        } else if (k.kapsam) govde = '<div class="s-tek">yalnız ' + kacis(k.kapsam) + "</div>";
+        if (k.belediye) govde += '<div class="s-baskanlik"><span class="s-alt-etiket">belediye başkanlığı</span>' +
+          k.belediye.sonuc.filter(x => x.ad !== BAGIMSIZ).slice(0, 3)
+            .map(x => '<span class="s-nw"><b>' + kacis(partiAdi(x).kisa) + "</b> " + O.sayiYaz(x.sayi) + "</span>").join('<span class="s-ayrac">·</span>') + "</div>";
+        govde += sehirlerHTML(k);
       } else if (k.tur === "referandum") {
         const e = O.yuzde(k.evet, k.gecerli), h = O.yuzde(k.hayir, k.gecerli);
         govde = '<div class="s-baslik s-konu" title="' + kacis(k.konu) + '">' + kacis(k.konu) + "</div>" +
+          (e != null && h != null ? '<div class="s-evethayir"><span><b>Evet</b> ' + O.yuzdeYaz(e) + "</span><span><b>Hayır</b> " +
+            O.yuzdeYaz(h) + "</span></div>" : "") +
           cubukHTML([{ kisa: "Evet", deger: e, renk: EVET }, { kisa: "Hayır", deger: h, renk: HAYIR }], "sonuç") +
-          '<div class="s-not">' + (k.karar === "kabul" ? "kabul edildi" : "reddedildi") +
-          " · katılım " + O.yuzdeYaz(katilimDegeri(k)) + "</div>";
+          kunyeSatiri(['<b class="s-karar">' + (k.karar === "kabul" ? "kabul edildi" : "reddedildi") + "</b>",
+            katilimDegeri(k) != null ? "katılım " + O.yuzdeYaz(katilimDegeri(k)) : null]);
       } else if (k.tur === "cb-halk") {
-        govde = '<div class="s-baslik">' + kacis(k.secilen) + " seçildi</div>" +
-          (k.turlar || []).map((t, i) => '<div class="s-not">' + (i + 1) + ". tur: " +
-            t.adaylar.slice().sort((a, b) => (oyDegeri(b, t) || 0) - (oyDegeri(a, t) || 0)).slice(0, 2)
-              .map(a => kacis(a.ad) + " " + O.yuzdeYaz(oyDegeri(a, t))).join(" · ") + "</div>").join("");
+        const turlar = k.turlar || [];
+        govde = '<div class="s-baslik">' + kacis(k.secilen) + " seçildi</div>" + turlar.map((t, i) => {
+          const l = oySirali(t, t.adaylar).slice(0, 2);
+          return '<div class="s-tur">' + (turlar.length > 1 ? '<span class="s-alt-etiket">' + (i + 1) + ". tur</span>" : "") +
+            '<ol class="s-aday">' + l.map(a => {
+              const y = oyDegeri(a, t);
+              return "<li><b>" + kacis(a.ad) + "</b>" + (y != null ? "<span>" + O.yuzdeYaz(y) + "</span>" : "") + "</li>";
+            }).join("") + "</ol></div>";
+        }).join("");
       } else if (k.tur === "cb-tbmm") {
         govde = '<div class="s-tek">' + (k.secilen ? kacis(k.secilen) + " seçildi" : "sonuçsuz") +
           (k.turSayisi != null ? " · " + k.turSayisi + " tur" : "") + "</div>";
       } else if (k.tur === "ara") {
-        govde = '<div class="s-tek">' + kacis(k.bolge) + " · " + O.sayiYaz(k.sandalyeSayisi) + " sandalye" +
-          ((k.sonuc || []).length ? " · " + k.sonuc.map(s => kacis(partiAdi(s).kisa) + " " + O.sayiYaz(s.sandalye)).join(", ") : "") + "</div>";
+        govde = '<div class="s-tek">' + araOzeti(k) + "</div>";
       }
       const tek = k.tur === "cb-tbmm" || k.tur === "ara" ? " s-kucuk" : "";
-      return '<div class="kart s-kart s-' + k.tur + tek + '" data-id="' + k.id + '" tabindex="0" role="button" style="--aile:' +
+      return '<div class="kart s-kart s-ac s-' + k.tur + tek + '" data-id="' + k.id + '" tabindex="0" role="button" style="--aile:' +
         kartRengi(k) + '">' + ustHTML(k) + govde + "</div>";
     }
+    function araOzeti(k) {
+      return [kacis(k.bolge), k.sandalyeSayisi != null ? O.sayiYaz(k.sandalyeSayisi) + " sandalye" : null].filter(Boolean).join(" · ");
+    }
 
-    function seritHTML(h) {
-      const renk = h.partiler && h.partiler.length && (h.tip !== "partiluestu" && h.tip !== "mbk" && h.tip !== "mgk")
+    /* ---- zaman çizelgesi: ayrıntılı sonucu olan kayıtlar kart, tek satırlık bilgiler satır olur ---- */
+    function kartMi(k) {
+      if (k.tur === "yerel") return oyVarMi(k, (k.sonuc || []).filter(s => !ozelSatir(s))) || !!k.belediye;
+      return k.tur === "genel" || k.tur === "referandum" || k.tur === "cb-halk";
+    }
+    // ardışık öğeleri (kronoloji öğeleri: {tarih, ...}) yıllarına göre toplar; sıra korunur
+    function yilGruplari(ogeler) {
+      const g = [];
+      for (const o of ogeler) {
+        const y = o.tarih.slice(0, 4), son = g[g.length - 1];
+        if (son && son.yil === y) son.ogeler.push(o); else g.push({ yil: y, ogeler: [o] });
+      }
+      return g;
+    }
+    function ilkCumle(t) { return String(t || "").split(/;\s|\.\s/)[0].replace(/\.$/, ""); }
+    // genel seçim kartı iki sütun kaplar; tek partili meclisler (çizimde tek renk) dar kartta kalır
+    function genisKartMi(k) {
+      return k.tur === "genel" && (meclisGruplari(k).filter(x => x.renk).length > 1 || (!meclisGruplari(k).length && oyVarMi(k, k.sonuc)));
+    }
+    function olayHTML(k) {
+      let ana = "", son = "";
+      if (k.tur === "cb-tbmm") {
+        ana = k.secilen ? "<b>" + kacis(k.secilen) + "</b> seçildi" : "sonuçsuz kaldı";
+        son = k.turSayisi != null ? k.turSayisi + " tur" : "";
+      } else if (k.tur === "ara") {
+        ana = araOzeti(k);
+        son = (k.sonuc || []).filter(s => s.sandalye != null).map(s => {
+          const a = partiAdi(s);
+          return '<span class="s-o-parti"><i style="background:' + a.renk + '"></i>' + kacis(a.kisa) + " " + O.sayiYaz(s.sandalye) + "</span>";
+        }).join("");
+      } else if (k.tur === "yerel") {
+        // ayrıntılı sonucu olmayan yerel seçim: kapsamı ya da notun ilk cümlesi (notun tamamı pencerede)
+        ana = k.kapsam ? "yalnız " + kacis(k.kapsam) : '<span class="s-o-not">' + kacis(ilkCumle(k.not)) + "</span>";
+        son = SEHIRLER.filter(x => k.buyuksehir && k.buyuksehir[x[0]]).map(x => {
+          const a = partiAdi(k.buyuksehir[x[0]]);
+          return '<span class="s-o-parti">' + x[1] + ' <i style="background:' + a.renk + '"></i>' + kacis(a.kisa) + "</span>";
+        }).join("");
+      } else {
+        ana = kacis(TUR_AD[k.tur] || "");
+      }
+      return '<div class="s-olay s-ac s-o-' + k.tur + '" data-id="' + k.id + '" tabindex="0" role="button" style="--aile:' + kartRengi(k) + '">' +
+        '<span class="s-o-tarih">' + O.tarihYaz(k.tarih, true) + '</span><span class="s-o-tur">' + rozetHTML(k.tur) + "</span>" +
+        '<span class="s-o-ana">' + ana + '</span><span class="s-o-son">' + son + "</span></div>";
+    }
+    function hukumetRengi(h) {
+      return h.partiler && h.partiler.length && (h.tip !== "partiluestu" && h.tip !== "mbk" && h.tip !== "mgk")
         ? partiAdi({ parti: h.partiler[0] }).renk : KESINTI;
-      const bas = h.no != null ? h.no + ". Hükümet" : "Hükümet";
-      const kisi = h.basbakan || h.baskan;
-      const partiler = h.partiler && h.partiler.length ? h.partiler.map(p => partiBag(p)).join("–") : (TIP_ETIKET[h.tip] || kacis(h.tip || "—"));
-      const aralik = O.tarihYaz(h.baslangic, true) + " – " + (h.bitis ? O.tarihYaz(h.bitis, true) : "görevde");
-      // halk arasında bilinen adı (kaynaklı) numaranın yanında; siyasi tarihte öne çıkanlar biraz daha büyük
-      const lakap = h.lakap ? ' <span class="s-lakap">' + kacis(h.lakap) + "</span>" : "";
-      return '<div class="s-serit' + (h.onemli ? " s-serit-onemli" : "") + '" style="--aile:' + renk + '"><b>' + bas + "</b>" + lakap + " · " + kacis(kisi) + " · " +
-        partiler + " · " + aralik +
-        (h.bitisNedeni ? '<div class="s-bitis">bitti: ' + kacis(BITIS_ETIKET[h.bitisNedeni]) +
-          (h.bitisNedeni === "diger" && h.not ? " — " + kacis(h.not) : "") + "</div>" : "") + "</div>";
+    }
+    function hukumetPartileri(h) {
+      return h.partiler && h.partiler.length ? h.partiler.map(p => partiBag(p)).join("–") : kacis(TIP_ETIKET[h.tip] || h.tip || "");
+    }
+    function bitisNedeni(h) {
+      return h.bitisNedeni ? kacis(BITIS_ETIKET[h.bitisNedeni]) + (h.bitisNedeni === "diger" && h.not ? " — " + kacis(h.not) : "") : "";
+    }
+    function hukumetSatiriHTML(h) {
+      const no = h.no != null ? h.no + ". Hükümet" : "Hükümet";
+      const neden = bitisNedeni(h);
+      return '<div class="s-olay s-hukumet' + (h.onemli ? " s-onemli" : "") + '" style="--aile:' + hukumetRengi(h) + '">' +
+        '<span class="s-o-tarih">' + O.tarihYaz(h.baslangic, true) + '</span><span class="s-o-tur"><b>' + no + "</b></span>" +
+        '<span class="s-o-ana">' + (h.lakap ? '<span class="s-lakap">' + kacis(h.lakap) + "</span> " : "") +
+        '<span class="s-o-kisi">' + kacis(h.basbakan || h.baskan) + "</span>" +
+        '<span class="s-o-partiler">' + hukumetPartileri(h) + "</span></span>" +
+        '<span class="s-o-son">' + (h.bitis ? "→ " + O.tarihYaz(h.bitis, true) : '<b class="s-gorevde">görevde</b>') +
+        (neden ? '<span class="s-o-neden">' + neden + "</span>" : "") + "</span></div>";
     }
 
     function liste(baslik, satirlar) {
       return satirlar.length ? '<div class="p-etiket">' + baslik + "</div><ul>" + satirlar.join("") + "</ul>" : "";
     }
     function sonucSatiri(k, s, sandalyeli) {
-      const a = partiAdi(s);
-      // yüzde bilinmeyip oy sayısı biliniyorsa satır "— · N oy" diye başlamaz
-      const y = oyDegeri(s, k);
-      const parca = [y != null || s.oy == null ? O.yuzdeYaz(y) : null, s.oy != null ? O.sayiYaz(s.oy) + " oy" : null,
-        sandalyeli ? O.sayiYaz(s.sandalye) + " sandalye" : null].filter(Boolean);
+      // yalnız bilinen değerler yazılır; hiçbir değeri bilinmeyen satır hiç çizilmez
+      const a = partiAdi(s), y = oyDegeri(s, k);
+      const parca = [y != null ? O.yuzdeYaz(y) : null, s.oy != null ? O.sayiYaz(s.oy) + " oy" : null,
+        sandalyeli && s.sandalye != null ? O.sayiYaz(s.sandalye) + " sandalye" : null].filter(Boolean);
+      if (!parca.length) return "";
       return '<li><i style="background:' + a.renk + '"></i>' + satirAdi(s) + "<span>" + parca.join(" · ") + "</span></li>";
     }
-    function tabloGrubu(k, baslik, satirlar) {
+    // satırda gösterilecek en az bir değer var mı (oy, oy oranı ya da sandalye)
+    const doluSatir = (k, s) => oyDegeri(s, k) != null || s.oy != null || s.sandalye != null;
+    function tabloGrubu(k, baslik, satirlar, oyKolon) {
+      satirlar = satirlar.filter(s => doluSatir(k, s));
       if (!satirlar.length) return "";
-      return '<tbody><tr class="p-grup"><th colspan="3" scope="rowgroup">' + baslik + "</th></tr>" + satirlar.map(s => {
-        const a = partiAdi(s);
-        const sandalye = s.ad === DIGER ? "" : "<b>" + O.sayiYaz(s.sandalye) + "</b>" +
+      return '<tbody><tr class="p-grup"><th colspan="' + (oyKolon ? 3 : 2) + '" scope="rowgroup">' + baslik + "</th></tr>" + satirlar.map(s => {
+        const a = partiAdi(s), y = oyDegeri(s, k);
+        const sandalye = s.ad === DIGER || s.sandalye == null ? "" : "<b>" + O.sayiYaz(s.sandalye) + "</b>" +
           (s.sandalye > 0 && k.meclis ? "<small>" + O.yuzdeYaz(s.sandalye / k.meclis * 100) + "</small>" : "");
-        return '<tr><td><i style="background:' + a.renk + '"></i>' + satirAdi(s) + "</td><td>" +
-          O.yuzdeYaz(oyDegeri(s, k)) + (s.oy != null ? "<small>" + O.sayiYaz(s.oy) + "</small>" : "") +
-          "</td><td>" + sandalye + "</td></tr>";
+        // oran bilinmeyip oy sayısı biliniyorsa sayı tek başına yazılır
+        const oy = !oyKolon ? "" : "<td>" + (y != null ? O.yuzdeYaz(y) + (s.oy != null ? "<small>" + O.sayiYaz(s.oy) + "</small>" : "")
+          : s.oy != null ? O.sayiYaz(s.oy) : "") + "</td>";
+        return '<tr><td><i style="background:' + a.renk + '"></i>' + satirAdi(s) + "</td>" + oy + "<td>" + sandalye + "</td></tr>";
       }).join("") + "</tbody>";
     }
     function meclisFiguru(k) {
@@ -385,69 +484,86 @@
         "</figcaption></figure>";
     }
     function meta(parcalar) {
-      return '<div class="p-meta">' + parcalar.filter(Boolean).join(" · ") + "</div>";
+      const p = parcalar.filter(Boolean);
+      return p.length ? '<div class="p-meta">' + p.join(" · ") + "</div>" : "";
     }
+    const katilimMetni = k => katilimDegeri(k) != null ? "katılım " + O.yuzdeYaz(katilimDegeri(k)) : null;
 
     function panelHTML(k, S, ek) {
       const harita = (ek && ek.harita) || "";   // il il harita (sayfa verirse)
-      let h = '<div class="p-kisa" id="p-kisa">' + k.tarih.slice(0, 4) + " " + TUR_AD[k.tur] + "</div>";
-      h += '<div class="p-ad">' + O.tarihYaz(k.tarih) + (k.tur === "ara" ? " · " + kacis(k.bolge) : "") + "</div>";
+      const renk = kartRengi(k);
+      // renk yalnız kenar şeridinde; nötr (gri) renkte başlık mürekkep rengiyle yazılır
+      let h = '<div class="p-kisa' + (renk === NOTR ? " p-notr" : "") + '" id="p-kisa">' + k.tarih.slice(0, 4) + " " + TUR_AD[k.tur] + "</div>";
+      h += '<div class="p-ad">' + O.tarihYaz(k.tarih) + (k.tur === "ara" && k.bolge ? " · " + kacis(k.bolge) : "") + "</div>";
       if (k.tur === "genel") {
         const d = meclisDurumu(k);
+        const oyKolon = k.sonuc.some(s => oyDegeri(s, k) != null || s.oy != null);
         h += meta([k.meclis != null ? O.sayiYaz(k.meclis) + " sandalye" : null,
-          "katılım " + O.yuzdeYaz(katilimDegeri(k)), k.baraj != null ? "baraj %" + k.baraj : null]);
+          katilimMetni(k), k.baraj != null ? "baraj %" + k.baraj : null]);
         h += meclisFiguru(k) + harita;
-        h += '<table class="p-tablo"><thead><tr><th scope="col">Parti</th><th scope="col">Oy</th>' +
+        h += '<table class="p-tablo"><thead><tr><th scope="col">Parti</th>' + (oyKolon ? '<th scope="col">Oy</th>' : "") +
           '<th scope="col">Sandalye</th></tr></thead>' +
-          tabloGrubu(k, "Meclise girenler", d.girenler) +
-          tabloGrubu(k, "Giremeyenler", d.giremeyenler) +
-          tabloGrubu(k, "Sandalye bilgisi yok", d.bilinmeyen) +
-          tabloGrubu(k, "Bağımsızlar", d.bagimsiz ? [d.bagimsiz] : []) +
-          tabloGrubu(k, d.diger ? "Diğer (" + O.sayiYaz(d.diger.partiSayisi) + " parti)" : "", d.diger ? [d.diger] : []) +
+          tabloGrubu(k, "Meclise girenler", d.girenler, oyKolon) +
+          tabloGrubu(k, "Giremeyenler", d.giremeyenler, oyKolon) +
+          tabloGrubu(k, "Sandalye bilgisi yok", d.bilinmeyen, oyKolon) +
+          tabloGrubu(k, "Bağımsızlar", d.bagimsiz ? [d.bagimsiz] : [], oyKolon) +
+          tabloGrubu(k, d.diger ? "Diğer (" + O.sayiYaz(d.diger.partiSayisi) + " parti)" : "", d.diger ? [d.diger] : [], oyKolon) +
           "</table>";
         for (const it of k.ittifak || [])
           h += '<div class="p-etiket">' + kacis(it.ad) + "</div><div class=\"p-ozet\">" + partiBag(it.liste) +
-            " listesinden: " + it.icinden.map(x => partiBag(x.parti) + " " + O.sayiYaz(x.sandalye)).join(", ") + "</div>";
-        h += liste("Bu seçimden sonra kurulan hükümetler", sonrakiHukumetler(k, S).map(x => "<li>" + seritHTML(x) + "</li>"));
+            " listesinden: " + it.icinden.map(x => partiBag(x.parti) + (x.sandalye != null ? " " + O.sayiYaz(x.sandalye) : "")).join(", ") + "</div>";
+        const hk = sonrakiHukumetler(k, S);
+        if (hk.length) h += '<div class="p-etiket">Bu seçimden sonra kurulan hükümetler</div><div class="s-olaylar p-olaylar">' +
+          hk.map(hukumetSatiriHTML).join("") + "</div>";
       } else if (k.tur === "yerel") {
-        h += meta([k.kapsam ? kacis(k.kapsam) : null, "katılım " + O.yuzdeYaz(katilimDegeri(k)),
-          k.olcu === "belediye-meclisi" ? "belediye meclisi oyları" : null]);
+        const partiler = (k.sonuc || []).filter(s => !ozelSatir(s));
+        const oyVar = oyVarMi(k, partiler) || (k.sonuc || []).some(s => s.oy != null);
+        h += meta([k.kapsam ? kacis(k.kapsam) : null, katilimMetni(k),
+          oyVar && k.olcu === "belediye-meclisi" ? "belediye meclisi oyları" : null]);
         // partiler oya göre; "Diğer" ve "Bağımsız" genel seçim panelindeki gibi sonda
         const sirali = (k.sonuc || []).slice().sort((a, c) => (ozelSatir(a) - ozelSatir(c)) ||
           (oyDegeri(c, k) || 0) - (oyDegeri(a, k) || 0));
         h += harita;
-        h += liste("Sonuç", sirali.map(s => sonucSatiri(k, s, false)));
+        const satirlar = sirali.map(s => sonucSatiri(k, s, false)).filter(Boolean);
+        if (satirlar.length) h += '<div class="p-etiket">Sonuç</div>' + cubukHTML(oyBolutleri(k, k.sonuc || []), "oy") +
+          "<ul>" + satirlar.join("") + "</ul>";
         h += baskanlikHTML(k);
         if (k.buyuksehir) h += liste("Büyükşehirler", SEHIRLER.filter(x => k.buyuksehir[x[0]]).map(x =>
-          "<li><b>" + x[1] + "</b>" + partiBag(k.buyuksehir[x[0]].parti) + "<span>" +
+          '<li><i style="background:' + partiAdi(k.buyuksehir[x[0]]).renk + '"></i><b>' + x[1] + "</b>" + partiBag(k.buyuksehir[x[0]].parti) + "<span>" +
             [k.buyuksehir[x[0]].aday, k.buyuksehir[x[0]].dipnot].filter(Boolean).map(kacis).join(" · ") + "</span></li>"));
       } else if (k.tur === "referandum") {
-        h += '<div class="p-ozet">' + kacis(k.konu) + "</div>";
-        h += meta(["katılım " + O.yuzdeYaz(katilimDegeri(k)), k.karar === "kabul" ? "kabul" : "ret"]);
-        h += liste("Sonuç", [
-          "<li><b>Evet</b><span>" + O.yuzdeYaz(O.yuzde(k.evet, k.gecerli)) + " · " + O.sayiYaz(k.evet) + " oy</span></li>",
-          "<li><b>Hayır</b><span>" + O.yuzdeYaz(O.yuzde(k.hayir, k.gecerli)) + " · " + O.sayiYaz(k.hayir) + " oy</span></li>"]);
+        const e = O.yuzde(k.evet, k.gecerli), hy = O.yuzde(k.hayir, k.gecerli);
+        h += '<div class="p-ozet p-konu">' + kacis(k.konu) + "</div>";
+        h += meta([k.karar === "kabul" ? "kabul edildi" : "reddedildi", katilimMetni(k)]);
+        const oySatiri = (ad, y, n) => (y != null || n != null) ? "<li><b>" + ad + "</b><span>" +
+          [y != null ? O.yuzdeYaz(y) : null, n != null ? O.sayiYaz(n) + " oy" : null].filter(Boolean).join(" · ") + "</span></li>" : "";
+        const l = [oySatiri("Evet", e, k.evet), oySatiri("Hayır", hy, k.hayir)].filter(Boolean);
+        if (l.length) h += '<div class="p-etiket">Sonuç</div>' +
+          cubukHTML([{ kisa: "Evet", deger: e, renk: EVET }, { kisa: "Hayır", deger: hy, renk: HAYIR }], "sonuç") + "<ul>" + l.join("") + "</ul>";
         h += harita;
         for (const [t, ad] of [["evet", "Evet dedi"], ["hayir", "Hayır dedi"], ["boykot", "Boykot etti"], ["serbest", "Serbest bıraktı"]]) {
           const p = (k.tutumlar || []).filter(x => x.tutum === t);
           if (p.length) h += '<div class="p-etiket">' + ad + '</div><div class="p-ozet">' + p.map(x => partiBag(x.parti)).join(", ") + "</div>";
         }
       } else if (k.tur === "cb-halk") {
+        h += meta([k.secilen ? "seçilen: " + kacis(k.secilen) : null]);
         (k.turlar || []).forEach((t, i) => {
-          h += '<div class="p-etiket">' + (i + 1) + ". tur · " + O.tarihYaz(t.tarih) + " · katılım " + O.yuzdeYaz(katilimDegeri(t)) + "</div>";
-          h += "<ul>" + t.adaylar.slice().sort((a, b) => (oyDegeri(b, t) || 0) - (oyDegeri(a, t) || 0)).map(a =>
-            "<li><b>" + kacis(a.ad) + "</b>" + (a.parti ? partiBag(a.parti) : kacis(a.destek || "")) + "<span>" +
-            O.yuzdeYaz(oyDegeri(a, t)) + "</span></li>").join("") + "</ul>";
+          h += '<div class="p-etiket">' + [(i + 1) + ". tur", O.tarihYaz(t.tarih), katilimMetni(t)].filter(Boolean).join(" · ") + "</div>";
+          h += '<ul class="p-adaylar">' + oySirali(t, t.adaylar).map(a => {
+            const y = oyDegeri(a, t), destek = a.parti ? partiBag(a.parti) : kacis(a.destek || "");
+            return '<li><div class="p-aday"><b>' + kacis(a.ad) + "</b>" + (destek ? "<small>" + destek + "</small>" : "") + "</div>" +
+              (y != null ? "<span>" + O.yuzdeYaz(y) + "</span>" : "") + "</li>";
+          }).join("") + "</ul>";
         });
-        h += meta(["seçilen: " + kacis(k.secilen)]);
       } else if (k.tur === "cb-tbmm") {
         h += meta([k.secilen ? "seçilen: " + kacis(k.secilen) : "sonuçsuz", k.turSayisi != null ? k.turSayisi + " tur" : null]);
       } else if (k.tur === "ara") {
-        h += meta([O.sayiYaz(k.sandalyeSayisi) + " sandalye"]);
-        h += liste("Kazananlar", (k.sonuc || []).map(s => "<li>" + satirAdi(s) + "<span>" + O.sayiYaz(s.sandalye) + " sandalye</span></li>"));
+        h += meta([k.sandalyeSayisi != null ? O.sayiYaz(k.sandalyeSayisi) + " sandalye" : null]);
+        h += liste("Kazananlar", (k.sonuc || []).map(s => '<li><i style="background:' + partiAdi(s).renk + '"></i>' + satirAdi(s) +
+          (s.sandalye != null ? "<span>" + O.sayiYaz(s.sandalye) + " sandalye</span>" : "") + "</li>"));
       }
       if (k.not) h += '<div class="p-etiket">Not</div><div class="p-ozet">' + kacis(k.not) + "</div>";
-      return { html: h, renk: kartRengi(k) };
+      return { html: h, renk };
     }
 
     /* ---- soyağacı künyesi: genel başkanlar (GB = window.GENEL_BASKANLAR) ---- */
@@ -469,11 +585,14 @@
         return ayniYil.length > 1 ? O.tarihYaz(k.tarih, true).replace(/^\d+ /, "") : k.tarih.slice(0, 4);
       };
       const bag = k => '<a class="p-git" href="sandik.html#' + k.id + '">' + etiket(k) + "</a>";
+      // bilinmeyen oy ya da sandalye yazılmaz
+      const yuzdeVarsa = (s, k) => oyDegeri(s, k) != null ? O.yuzdeYaz(oyDegeri(s, k)) : null;
       const genel = s.genel.map(x => "<li>" + bag(x.kayit) + "<span>" + (x.satir
-        ? O.yuzdeYaz(oyDegeri(x.satir, x.kayit)) + " · " + O.sayiYaz(x.satir.sandalye) + " sandalye"
-        : kacis(partiAdi({ parti: x.ittifak.liste }).kisa) + " listesinden " + O.sayiYaz(x.ittifak.sandalye) + " vekil") +
+        ? [yuzdeVarsa(x.satir, x.kayit), x.satir.sandalye != null ? O.sayiYaz(x.satir.sandalye) + " sandalye" : null].filter(Boolean).join(" · ")
+        : kacis(partiAdi({ parti: x.ittifak.liste }).kisa) + " listesinden" +
+          (x.ittifak.sandalye != null ? " " + O.sayiYaz(x.ittifak.sandalye) + " vekil" : "")) +
         "</span></li>");
-      const yerel = s.yerel.map(x => "<li>" + bag(x.kayit) + "<span>" + O.yuzdeYaz(oyDegeri(x.satir, x.kayit)) + "</span></li>");
+      const yerel = s.yerel.map(x => "<li>" + bag(x.kayit) + "<span>" + (yuzdeVarsa(x.satir, x.kayit) || "") + "</span></li>");
       return liste("Girdiği genel seçimler", genel) + liste("Girdiği yerel seçimler", yerel);
     }
 
@@ -501,7 +620,8 @@
     return { BAGIMSIZ, DIGER, NOTR, KESINTI, TUR_ETIKET, TUR_AD, BITIS_ETIKET,
              partiAdi, oyDegeri, katilimDegeri, siralaGenel, baslikGenel, meclisDurumu,
              donemBul, kronoloji, sonrakiHukumetler, partininSecimleri,
-             kacis, rozetHTML, genelBaskanlarHTML, cubukHTML, meclisGruplari, meclisSVG, kartHTML, seritHTML, panelHTML, kunyeSecimleriHTML,
+             kacis, rozetHTML, genelBaskanlarHTML, cubukHTML, meclisGruplari, meclisSVG, kartHTML, panelHTML, kunyeSecimleriHTML,
+             kartMi, genisKartMi, yilGruplari, olayHTML, hukumetSatiriHTML,
              birinciIller, haritaKunyeHTML };
   }
   return { olustur };

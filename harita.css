@@ -32,10 +32,6 @@
 .h-secim{display:flex;align-items:center;gap:6px}
 .h-secim select{font-family:"IBM Plex Mono",monospace;font-size:12px;padding:5px 8px;border:1px solid var(--cizgi);
   background:var(--kart);color:var(--murekkep)}
-.tur-dugme{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.04em;padding:5px 9px;
-  border:1px solid var(--cizgi);background:none;color:var(--soluk);cursor:pointer}
-.tur-dugme[aria-pressed="true"]{border-color:var(--murekkep);color:var(--murekkep);background:rgba(21,24,16,.07);font-weight:600}
-.turlar{display:flex;flex-wrap:wrap;gap:6px}
 .h-sahne{max-width:1100px;margin:0 auto;background:var(--kart);border:1px solid var(--cizgi);padding:16px 18px 14px}
 .h-baslik{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;margin-bottom:10px}
 .h-baslik b{font-family:"Fraunces",serif;font-size:22px;font-weight:700}
@@ -58,7 +54,6 @@
 .h-harita .h-il.h-secik{stroke:var(--murekkep);stroke-width:1.6;opacity:1}
 .h-harita .h-il{cursor:pointer}
 @media (max-width:560px){
-  .tur-dugme{min-height:38px;padding-left:12px;padding-right:12px}
   .h-secim select{min-height:38px}
   .h-secim button{min-width:38px;min-height:38px}
   .h-yan .p-etiket,.h-tablo thead th{font-size:11px}

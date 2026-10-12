@@ -28,10 +28,10 @@
 
 ## İlerleme
 
-- [ ] 0. Görev kaydı (bu dosya)
-- [ ] 1. Mevcut durum taraması (ekran görüntüleri: masaüstü + telefon, dört sayfa)
-- [ ] 2. Sandık: boş veri gizleme
-- [ ] 3. Sandık: görsel düzen / okunabilirlik
+- [x] 0. Görev kaydı (bu dosya)
+- [x] 1. Mevcut durum taraması (ekran görüntüleri: masaüstü + telefon, dört sayfa)
+- [x] 2. Sandık: boş veri gizleme (kartta/pencerede "—", "veri yok", "katılım —", boş satır/sütun yok)
+- [~] 3. Sandık: görsel düzen — yıl çizelgesi, hizalı satırlar (hükümet, TBMM CB, ara, ayrıntısız yerel), kartlar yenilendi; ince ayar sürüyor
 - [ ] 4. Soyağacı, harita, kaynakça: okunabilirlik düzeltmeleri
 - [ ] 5. Optimizasyon (yükleme, çizim, mobil)
 - [ ] 6. Son denetim (testler, doğrulama, ekran görüntüleri, file://)

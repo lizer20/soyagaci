@@ -79,37 +79,42 @@ test("yerel kart büyükşehirleri gösterir", () => {
   assert.ok(h.includes(M.kacis(kisa("chp92"))));
 });
 
-test("bilinmeyen oy — olarak yazılır ve çubuk bölütü çizilmez", () => {
+test("bilinmeyen oy yazılmaz (— da yazılmaz); hiç değer yoksa çubuk ve oy sütunu çizilmez", () => {
   const k = structuredClone(kayit("1999-04-genel"));
   k.sonuc[1].oy = null;
   const h = M.kartHTML(k);
-  assert.ok(h.includes("—"));
-  assert.equal(M.cubukHTML([{ kisa: "X", deger: null, renk: "#000000" }], "oy"), '<div class="cubuk-yok">veri yok</div>');
+  assert.ok(!h.includes("—"));
+  assert.match(h, /class="cubuk"/);
+  assert.equal(M.cubukHTML([{ kisa: "X", deger: null, renk: "#000000" }], "oy"), "");
+  k.sonuc.forEach(s => { s.oy = null; });
+  const bos = M.kartHTML(k);
+  assert.doesNotMatch(bos, /class="cubuk"|veri yok|<span>oy<\/span>/);
+  assert.match(bos, /s-koltuk s-oysuz/);
 });
 
-test("hükümet şeridi: numara, soyağacı bağlantısı, bitiş nedeni; görevdeki hükümet", () => {
-  const h57 = M.seritHTML(F.hukumetler[0]);
+test("hükümet satırı: numara, soyağacı bağlantısı, bitiş nedeni; görevdeki hükümet", () => {
+  const h57 = M.hukumetSatiriHTML(F.hukumetler[0]);
   assert.match(h57, /57\. Hükümet/);
   assert.match(h57, /href="index\.html#dsp"/);
-  assert.match(h57, /bitti: erken seçim kararı/);
-  const h58 = M.seritHTML(F.hukumetler[1]);
+  assert.match(h57, /<span class="s-o-neden">erken seçim kararı<\/span>/);
+  const h58 = M.hukumetSatiriHTML(F.hukumetler[1]);
   assert.match(h58, /görevde/);
-  assert.doesNotMatch(h58, /bitti:/);
+  assert.doesNotMatch(h58, /s-o-neden/);
 });
 
 test("partilerüstü hükümet kesinti rengini alır", () => {
-  const h = M.seritHTML({ no: null, baskan: "C", partiler: [], baslangic: "1980-09-21",
+  const h = M.hukumetSatiriHTML({ no: null, baskan: "C", partiler: [], baslangic: "1980-09-21",
     bitis: "1983-12-13", tip: "partiluestu", bitisNedeni: null });
   assert.ok(h.includes("--aile:" + M.KESINTI));
   assert.match(h, /partilerüstü/);
 });
 
 test("askerî yönetim hükümetleri kendi organının adıyla gösterilir", () => {
-  const mgk = M.seritHTML({ no: 1, basbakan: "C", partiler: [], baslangic: "1980-09-20",
+  const mgk = M.hukumetSatiriHTML({ no: 1, basbakan: "C", partiler: [], baslangic: "1980-09-20",
     bitis: "1983-12-13", tip: "mgk", bitisNedeni: null });
   assert.match(mgk, /Millî Güvenlik Konseyi/);
   assert.ok(mgk.includes("--aile:" + M.KESINTI));
-  const mbk = M.seritHTML({ no: 1, basbakan: "C", partiler: [], baslangic: "1960-05-30",
+  const mbk = M.hukumetSatiriHTML({ no: 1, basbakan: "C", partiler: [], baslangic: "1960-05-30",
     bitis: "1961-01-05", tip: "mbk", bitisNedeni: null });
   assert.match(mbk, /Millî Birlik Komitesi/);
 });
@@ -130,7 +135,7 @@ test("sandalyesi bilinmeyen parti panelde ayrı listede görünür", () => {
   k.sonuc.find(s => s.parti === "fp").sandalye = null;
   const { html } = M.panelHTML(k, F);
   assert.ok(html.includes("Sandalye bilgisi yok"));
-  assert.ok(html.includes("<td><b>—</b></td>"));
+  assert.ok(!html.includes("—"));
   assert.ok(!html.includes(">Giremeyenler<"));   // fp artık giremeyenlerde değil
 });
 
@@ -194,14 +199,21 @@ test("künye: seçim kaydı olmayan partide boş", () => {
   assert.equal(M.kunyeSecimleriHTML("tcf", F), "");
 });
 
-test("yerel seçimde oy bilinmiyorsa ilk üç yerine tek satır uyarı", () => {
+test("yerel seçimde oy bilinmiyorsa kart boş uyarı yazmaz; zaman çizelgesinde satır olur", () => {
   const bos = { id: "1984-03-yerel", tur: "yerel", tarih: "1984-03-25", olcu: "belediye-meclisi",
-    kayitli: null, kullanilan: null, gecerli: null,
+    kayitli: null, kullanilan: null, gecerli: null, not: "Ayrıntı <yok>; ülke geneli bulunamadı.",
     sonuc: [{ parti: "dsp", oy: null }, { parti: "dsp", oy: null }] };
   const h = M.kartHTML(bos);
-  assert.match(h, /oy dağılımı kayıtlı değil/);
-  assert.doesNotMatch(h, /veri yok/);
+  assert.doesNotMatch(h, /kayıtlı değil|veri yok|—/);
   assert.doesNotMatch(h, /s-ilk3/);
+  assert.equal(M.kartMi(bos), false);
+  assert.equal(M.kartMi(kayit("2004-03-yerel")), true);
+  const o = M.olayHTML(bos);
+  assert.match(o, /class="s-olay s-ac s-o-yerel" data-id="1984-03-yerel"/);
+  assert.ok(o.includes(">Ayrıntı &lt;yok&gt;</span>"));   // satırda notun yalnız ilk cümlesi
+  assert.ok(M.panelHTML(bos, F).html.includes("ülke geneli bulunamadı"));
+  const p = M.panelHTML(bos, F).html;
+  assert.doesNotMatch(p, /katılım|belediye meclisi oyları|—/);
 });
 
 test("tek şehirlik yenileme seçimi: kapsam yazılır, 'belediye meclisi oyları' yazılmaz", () => {
@@ -221,8 +233,8 @@ test("yerel panel satırı yüzde bilinmezken '— · N oy' diye başlamaz", () 
   assert.ok(html.includes("<span>500 oy</span>"));
 });
 
-test("hükümet şeridi bilinmeyen tipte 'undefined' yazmaz", () => {
-  const h = M.seritHTML({ no: 1, basbakan: "C", partiler: [], baslangic: "1960-05-30",
+test("hükümet satırı bilinmeyen tipte 'undefined' yazmaz", () => {
+  const h = M.hukumetSatiriHTML({ no: 1, basbakan: "C", partiler: [], baslangic: "1960-05-30",
     bitis: null, tip: "yeni-tip", bitisNedeni: null });
   assert.doesNotMatch(h, /undefined/);
 });
@@ -278,7 +290,7 @@ test("yerel: kazanılan belediye başkanlıkları kartta ve pencerede", () => {
   k.belediye = { yapilan: 12, sonuc: [{ parti: "dsp", sayi: 6 }, { ad: "Bağımsız", sayi: 3 }, { ad: "Genç Parti", sayi: 2 }],
                  buyuksehir: [{ parti: "dsp", sayi: 1 }], not: "ilan <x>" };
   const kart = M.kartHTML(k);
-  assert.match(kart, /başkanlık · <b>DSP<\/b> 6 · <b>Genç Parti<\/b> 2/);
+  assert.match(kart, /belediye başkanlığı<\/span><span class="s-nw"><b>DSP<\/b> 6<\/span><span class="s-ayrac">·<\/span><span class="s-nw"><b>Genç Parti<\/b> 2/);
   assert.ok(!/Bağımsız<\/b>/.test(kart));
   const h = M.panelHTML(k, F).html;
   assert.match(h, /Kazanılan belediye başkanlıkları · 11/);
@@ -289,14 +301,14 @@ test("yerel: kazanılan belediye başkanlıkları kartta ve pencerede", () => {
   assert.equal(M.panelHTML(kayit("2004-03-yerel"), F).html.includes("Kazanılan belediye"), false);
 });
 
-test("hükümet şeridi: yaygın adı numaranın yanında, öne çıkan hükümet büyük gösterilir", () => {
-  const sade = M.seritHTML(F.hukumetler[1]);
-  assert.doesNotMatch(sade, /s-lakap|s-serit-onemli/);
-  const h = M.seritHTML(Object.assign({}, F.hukumetler[0], { lakap: "ANASOL-M", onemli: true }));
-  assert.match(h, /class="s-serit s-serit-onemli"/);
-  assert.match(h, /57\. Hükümet<\/b> <span class="s-lakap">ANASOL-M<\/span> · /);
-  const k = M.seritHTML(Object.assign({}, F.hukumetler[0], { lakap: "A<B" }));
-  assert.match(k, /class="s-serit"/);
+test("hükümet satırı: yaygın adı numaranın yanında, öne çıkan hükümet büyük gösterilir", () => {
+  const sade = M.hukumetSatiriHTML(F.hukumetler[1]);
+  assert.doesNotMatch(sade, /s-lakap|s-onemli/);
+  const h = M.hukumetSatiriHTML(Object.assign({}, F.hukumetler[0], { lakap: "ANASOL-M", onemli: true }));
+  assert.match(h, /class="s-olay s-hukumet s-onemli"/);
+  assert.match(h, /57\. Hükümet<\/b><\/span><span class="s-o-ana"><span class="s-lakap">ANASOL-M<\/span> /);
+  const k = M.hukumetSatiriHTML(Object.assign({}, F.hukumetler[0], { lakap: "A<B" }));
+  assert.match(k, /class="s-olay s-hukumet"/);
   assert.match(k, /A&lt;B/);
 });
 
@@ -317,4 +329,36 @@ test("genel başkanlar: yıl aralığı, görevde, bilinmeyen yıl, not ve eş b
   assert.match(M.genelBaskanlarHTML("c", GB), /1966 – \?/);
   assert.equal(M.genelBaskanlarHTML("yok", GB), "");
   assert.equal(M.genelBaskanlarHTML("a", undefined), "");
+});
+
+test("zaman çizelgesi: kart/satır ayrımı, yıl grupları ve hükümet satırı", () => {
+  for (const id of ["1999-04-genel", "2007-10-referandum"]) assert.equal(M.kartMi(kayit(id)), true);
+  assert.equal(M.kartMi({ id: "x", tur: "cb-tbmm", tarih: "2000-05-05" }), false);
+  assert.equal(M.kartMi({ id: "x", tur: "ara", tarih: "2003-03-09" }), false);
+  const g = M.yilGruplari([{ tarih: "1999-04-18" }, { tarih: "1999-05-28" }, { tarih: "2002-11-03" }, { tarih: "1999-12-01" }]);
+  assert.deepEqual(g.map(x => [x.yil, x.ogeler.length]), [["1999", 2], ["2002", 1], ["1999", 1]]);
+  const h = M.hukumetSatiriHTML(Object.assign({}, F.hukumetler[0], { lakap: "ANASOL-D", onemli: true }));
+  assert.match(h, /class="s-olay s-hukumet s-onemli"/);
+  assert.match(h, /<b>57\. Hükümet<\/b>/);
+  assert.match(h, /<span class="s-lakap">ANASOL-D<\/span>/);
+  assert.match(h, /href="index\.html#dsp"/);
+  assert.match(h, /→ 18 Kas 2002/);
+  assert.match(h, /erken seçim kararı/);
+  assert.match(M.hukumetSatiriHTML(F.hukumetler[1]), /görevde/);
+  const tb = M.olayHTML({ id: "1980-03-cb-tbmm", tur: "cb-tbmm", tarih: "1980-03-25", secilen: null, turSayisi: null });
+  assert.match(tb, /sonuçsuz kaldı/);
+  assert.doesNotMatch(tb, /tur<|—|null/);
+  const ara = M.olayHTML({ id: "1951-09-ara", tur: "ara", tarih: "1951-09-16", bolge: "17 il", sandalyeSayisi: 20, sonuc: [] });
+  assert.match(ara, /17 il · 20 sandalye/);
+});
+
+test("pencerede bilinmeyen değerler yazılmaz: katılım, ittifak sandalyesi, boş bağımsız satırı", () => {
+  const k = structuredClone(kayit("2002-11-genel"));
+  k.kayitli = null; k.ittifak[0].icinden.push({ parti: "akp", sandalye: null });
+  k.sonuc.push({ ad: "Bağımsız", oy: null, sandalye: null });
+  const h = M.panelHTML(k, F).html;
+  assert.doesNotMatch(h, /katılım|—|Bağımsızlar/);
+  assert.match(h, /href="index\.html#akp">[^<]+<\/a><\/div>/);
+  const tek = M.panelHTML(kayit("1927-09-genel"), F).html;
+  assert.doesNotMatch(tek, /<th scope="col">Oy<\/th>|—/);
 });

@@ -12,19 +12,27 @@
   const rows = document.getElementById("rows");
   const kr = M.kronoloji(S);
 
-  /* ---- çizim ---- */
+  /* ---- çizim: her dönem bandında yıllara göre bir zaman çizelgesi. Ayrıntılı sonucu olan
+     seçimler kart, hükümetler ve tek satırlık kayıtlar (TBMM'de cumhurbaşkanlığı, ara seçim,
+     ayrıntısı bilinmeyen yerel seçim) kartların altında tarih sırasıyla satır olur. ---- */
+  const kartMi = o => o.tur === "secim" && M.kartMi(o.kayit);
   function ogeHTML(o) {
     if (o.tur === "secim") {
       const y = o.tarih.slice(0, 4);
-      return '<div class="s-oge" data-tur="' + o.kayit.tur + '" data-bas="' + y + '" data-bit="' + y + '">' +
-        M.kartHTML(o.kayit) + "</div>";
+      return '<div class="s-oge' + (M.genisKartMi(o.kayit) ? " s-genis" : "") + '" data-tur="' + o.kayit.tur + '" data-bas="' + y + '" data-bit="' + y + '">' +
+        (kartMi(o) ? M.kartHTML(o.kayit) : M.olayHTML(o.kayit)) + "</div>";
     }
     const h = o.hukumet;
-    return '<div class="s-oge s-oge-serit" data-tur="hukumet" data-bas="' + h.baslangic.slice(0, 4) +
-      '" data-bit="' + (h.bitis ? h.bitis.slice(0, 4) : "9999") + '">' + M.seritHTML(h) + "</div>";
+    return '<div class="s-oge" data-tur="hukumet" data-bas="' + h.baslangic.slice(0, 4) +
+      '" data-bit="' + (h.bitis ? h.bitis.slice(0, 4) : "9999") + '">' + M.hukumetSatiriHTML(h) + "</div>";
   }
-  function satirHTML(ogeler) {
-    return ogeler.length ? '<div class="s-satir">' + ogeler.map(ogeHTML).join("") + "</div>" : "";
+  function yillarHTML(ogeler) {
+    return M.yilGruplari(ogeler).map(g => {
+      const kartlar = g.ogeler.filter(kartMi), satirlar = g.ogeler.filter(o => !kartMi(o));
+      return '<section class="s-yil"><h2 class="s-yil-no">' + g.yil + '</h2><div class="s-yil-ic">' +
+        (kartlar.length ? '<div class="s-kartlar">' + kartlar.map(ogeHTML).join("") + "</div>" : "") +
+        (satirlar.length ? '<div class="s-olaylar">' + satirlar.map(ogeHTML).join("") + "</div>" : "") + "</div></section>";
+    }).join("");
   }
   function bantBul(donem) { return rows.querySelector('.banner[aria-controls="' + donem.id + '"]'); }
 
@@ -40,12 +48,12 @@
     const once = k ? ogeler.filter(o => o.tarih < k.tarih) : ogeler;
     const sonra = k ? ogeler.filter(o => o.tarih >= k.tarih) : [];
     let html = !ogeler.length && !kap.length ? '<p class="s-bos">bu dönem için henüz kayıt yok</p>' : "";
-    html += satirHTML(once);
+    html += yillarHTML(once);
     if (k) {
       html += '<div class="banner kesinti"><span class="yil">⚡</span><span class="ad">' + M.kacis(k.metin) + "</span></div>";
-      if (kap.length) html += '<div class="s-kap" role="group" aria-label="askerî yönetim dönemi">' + satirHTML(kap) + "</div>";
+      if (kap.length) html += '<div class="s-kap" role="group" aria-label="askerî yönetim dönemi">' + yillarHTML(kap) + "</div>";
     }
-    html += satirHTML(sonra);
+    html += yillarHTML(sonra);
     icerik.innerHTML = html;
     rows.appendChild(b); rows.appendChild(icerik);
     O.bantKur(b, icerik);
@@ -53,8 +61,9 @@
 
   /* ---- araç çubuğu ---- */
   const turlar = document.getElementById("turlar");
+  const sayi = t => t === "hukumet" ? S.hukumetler.length : S.secimler.filter(k => k.tur === t).length;
   turlar.innerHTML = TURLER.map(t => '<button type="button" class="tur-dugme" data-tur="' + t[0] +
-    '" aria-pressed="true">' + t[1] + "</button>").join("");
+    '" aria-pressed="true">' + t[1] + ' <span class="tur-sayi">' + sayi(t[0]) + "</span></button>").join("");
   turlar.addEventListener("click", e => {
     const d = e.target.closest(".tur-dugme"); if (!d) return;
     const t = d.dataset.tur;
@@ -91,6 +100,13 @@
       const donem = el.closest(".s-donem");
       if (tutar && !el.hidden && donem.classList.contains("kapali")) O.bantDurum(bantBul(donem), donem, false);
     });
+    // görünür öğesi kalmayan kart/satır grubu ve yıl gizlenir; boş başlık kalmasın
+    rows.querySelectorAll(".s-kartlar, .s-olaylar, .s-yil").forEach(el => {
+      el.hidden = !el.querySelector(".s-oge:not([hidden])");
+    });
+    rows.querySelectorAll(".s-yil").forEach(el => {
+      el.classList.toggle("sonuc", !!el.querySelector(".s-oge.sonuc:not([hidden])"));
+    });
     temizle.classList.toggle("aktif", yilFiltre !== null || acikTurler.size < TURLER.length);
   }
 
@@ -98,7 +114,7 @@
   const Panel = O.panelKur({
     panel: document.getElementById("panel"), perde: document.getElementById("perde"),
     govde: document.getElementById("p-govde"), kapatDugmesi: document.getElementById("kapat"),
-    odakSecici: ".s-kart",
+    odakSecici: ".s-ac",
     kapaninca: () => history.replaceState(null, "", location.pathname + location.search)
   });
   const V = window.IL_SONUCLARI || {};
@@ -116,7 +132,8 @@
     history.replaceState(null, "", "#" + id);
   }
   rows.addEventListener("click", e => {
-    const k = e.target.closest(".s-kart"); if (k) ac(k.dataset.id);
+    if (e.target.closest("a")) return;   // satırdaki parti bağlantısı soyağacına gider
+    const k = e.target.closest(".s-ac"); if (k) ac(k.dataset.id);
   });
   // paneldeki küçük haritada dokunulan ilin bilgisi haritanın altında yazılır (telefonda üzerine gelmek yok)
   function panelIl(e) {
@@ -130,8 +147,8 @@
   document.getElementById("p-govde").addEventListener("click", panelIl);
   document.getElementById("p-govde").addEventListener("mouseover", panelIl);
   rows.addEventListener("keydown", e => {
-    const k = e.target.closest(".s-kart");
-    if (k && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); ac(k.dataset.id); }
+    const k = e.target.closest(".s-ac");
+    if (k && e.target === k && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); ac(k.dataset.id); }
   });
   function hashAc() {
     const id = O.hashOku(location.hash); if (!id) return;
