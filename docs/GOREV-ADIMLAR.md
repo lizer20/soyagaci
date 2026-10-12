@@ -44,4 +44,4 @@ Yapılmayacaklar (şimdilik): 1 (ana sitenin site haritası), 7 (genel başkan l
 - [x] 5 Hükümette geçen süre (`partiHukumetleriHTML`; kaynakça "süre" maddesi)
 - [x] 6 İttifak vekil sayıları — **doldurulamadı**: resmî kaynak yok (TBMM albümü Aralık 2023 üyeliği; Haziran 2023 arşivine erişim yok); değerler boş kaldı, deftere işlendi
 - [x] 8 Küçük açık kalemler — 1931–1943 bağımsızlar **düzeltildi** (TBMM Türk Parlamento Tarihi + Olgun + Baltacı); 2007 MHP/AK Parti tutumu ikinci kaynak yok, yazılmadı
-- [~] 2 Eski adres yönlendirmesi — sayfalar hazır ve test edildi (`araclar/eski-adres/`); bu oturum ne yeni depo oluşturabiliyor (403) ne de `lizer20.github.io`'ya yazabiliyor (Claude GitHub uygulaması o depoda kurulu değil). Kullanıcı ya uygulamayı o depoya kurar (sonra Claude klasörü ekler) ya da klasörü elle yükler — bkz. `araclar/eski-adres/BENIOKU.md`
+- [x] 2 Eski adres yönlendirmesi — kullanıcı Claude GitHub uygulamasını `lizer20.github.io`'ya kurdu; klasör `turkiye_siyasi_partiler_soyagaci/` o depoya eklendi (85ec3b3). Kaynak dosyalar: `araclar/eski-adres/`

@@ -1,5 +1,8 @@
 # Eski adres yönlendirmesi
 
+> **Durum (12 Ekim 2026):** klasör `lizer20/lizer20.github.io` deposuna eklendi (commit 85ec3b3); eski
+> bağlantılar yeni adrese gidiyor. Sayfaları değiştirirsen o depodaki kopyayı da güncelle.
+
 Depo adı `turkiye_siyasi_partiler_soyagaci`'dan `soyagaci`'ya değişince eski bağlantılar
 (`emrebiltekin.me/turkiye_siyasi_partiler_soyagaci/…`) "sayfa bulunamadı" vermeye başladı.
 

@@ -44,7 +44,7 @@ Bu dosya, projenin bir sohbetten başka bir sohbete aktarılması için yazıld�
 > Sandık'ın telefonda hızlı açılması (`content-visibility` + `kaydir()`); hükümet penceresi (`#hukumet-57`), Sandık'ta
 > arama, parti penceresinde "yer aldığı hükümetler"; **veri düzeltmesi:** 1931–1943 tek parti seçimlerinde bağımsız
 > (müstakil) milletvekilleri ve yeni `sonradan` alanı. İttifak vekil sayıları ve 2007 MHP/AK Parti tutumu kaynaksız
-> kaldı. Eski adres yönlendirmesi hazır (`araclar/eski-adres/`), ana site deposuna eklenmesi kullanıcıda.
+> kaldı. Eski adres yönlendirmesi `lizer20.github.io` deposuna `turkiye_siyasi_partiler_soyagaci/` klasörü olarak eklendi (kaynak: `araclar/eski-adres/`).
 > Depo artık `lizer20/soyagaci` (yerel `origin` bu adla). Testler 99/99.
 
 ---
