@@ -38,6 +38,14 @@ Bu dosya, projenin bir sohbetten başka bir sohbete aktarılması için yazıld�
 > tamamı `docs/GOREV-GORUNUM.md`'de. Sandık yeni düzende (yıl çizelgesi, hizalı satırlar, boş veri
 > gizli); yazı tipleri inceltildi; harita verisi sonradan yükleniyor. Kullanıcı onayladı, `main`'e
 > alındı ve yayınlandı. Testler 93/93.
+>
+> **Güncelleme (12 Ekim 2026, akşam) — sonraki adımlar turu:** ayrıntı `docs/GOREV-ADIMLAR.md`. Yayında:
+> README; tek komutla site denetimi (`araclar/denetim/site.js`) ve GitHub Actions (`.github/workflows/denetim.yml`);
+> Sandık'ın telefonda hızlı açılması (`content-visibility` + `kaydir()`); hükümet penceresi (`#hukumet-57`), Sandık'ta
+> arama, parti penceresinde "yer aldığı hükümetler"; **veri düzeltmesi:** 1931–1943 tek parti seçimlerinde bağımsız
+> (müstakil) milletvekilleri ve yeni `sonradan` alanı. İttifak vekil sayıları ve 2007 MHP/AK Parti tutumu kaynaksız
+> kaldı. Eski adres yönlendirmesi hazır (`araclar/eski-adres/`), ana site deposuna eklenmesi kullanıcıda.
+> Depo artık `lizer20/soyagaci` (yerel `origin` bu adla). Testler 99/99.
 
 ---
 
