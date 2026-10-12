@@ -189,7 +189,6 @@
 <script src="veri/partiler.js"></script>
 <script src="veri/sandik.js"></script>
 <script src="veri/genel-baskanlar.js"></script>
-<script src="veri/il-sonuclari.js"></script>
 <script src="ortak.js"></script>
 <script src="sandik-mantik.js"></script>
 <script>
@@ -419,9 +418,16 @@
       (n.sembol?'<div class="p-etiket">Sembol</div><div class="p-sembol">'+n.sembol+'</div>':'')+
       (oncul.length?'<div class="p-etiket">Nereden geldi</div><ul>'+satirlar(oncul)+'</ul>':'')+
       (ardil.length?'<div class="p-etiket">Nereye gitti</div><ul>'+satirlar(ardil)+'</ul>':'');
-    const secimler = SM.kunyeSecimleriHTML(id, SANDIK) + SM.haritaKunyeHTML(id, SANDIK, window.IL_SONUCLARI);
+    // il sonuçları (≈240 KB) yalnız bir parti penceresi açılınca yüklenir; "birinci çıktığı iller" sonra dolar
+    const ilVar = !!window.IL_SONUCLARI;
+    const secimler = SM.kunyeSecimleriHTML(id, SANDIK) + '<div class="p-hk" data-id="'+id+'">' +
+      (ilVar ? SM.haritaKunyeHTML(id, SANDIK, window.IL_SONUCLARI) : "") + '</div>';
     Panel.ac(html + secimler, renk);
     history.replaceState(null, "", "#" + id);
+    if(!ilVar) Ortak.betikYukle("veri/il-sonuclari.js").then(()=>{
+      const yer = govde.querySelector('.p-hk[data-id="'+id+'"]');
+      if(yer) yer.innerHTML = SM.haritaKunyeHTML(id, SANDIK, window.IL_SONUCLARI);
+    }, ()=>{});
   }
 
   chart.addEventListener("click",ev=>{

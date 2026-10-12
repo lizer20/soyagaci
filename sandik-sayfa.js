@@ -142,9 +142,16 @@
     odakSecici: ".s-ac",
     kapaninca: () => history.replaceState(null, "", location.pathname + location.search)
   });
-  const V = window.IL_SONUCLARI || {};
-  const H = window.HaritaMantik && window.ILLER ? window.HaritaMantik.olustur(window.ILLER, M, O) : null;
+  /* il haritası verisi (≈345 KB) sayfanın ilk çiziminde gerekmez: sayfa çizildikten sonra arka planda
+     yüklenir. Pencere ondan önce açılırsa haritanın yeri ayrılır, veri gelince doldurulur. */
+  let V = null, H = null;
+  const haritaHazir = O.betikYukle("veri/iller.js").then(() => O.betikYukle("veri/il-sonuclari.js")).then(() => {
+    V = window.IL_SONUCLARI || {};
+    H = window.HaritaMantik && window.ILLER ? window.HaritaMantik.olustur(window.ILLER, M, O) : null;
+  });
+  haritaHazir.catch(() => {});   // yüklenemezse pencereler haritasız açılır
   function haritaHTML(k) {
+    if (!V) return '<div class="p-harita-yer" data-id="' + k.id + '"></div>';
     if (!H || !V[k.id]) return "";
     return '<div class="p-etiket">' + (k.tur === "genel" ? "İllere göre birinci parti" : k.tur === "referandum" ? "İllere göre evet ve hayır" : "İl merkezi belediye başkanlıkları") +
       '</div><div class="p-harita">' + H.haritaSVG(k, V[k.id]) + '<div class="h-secili"></div>' + H.lejantHTML(k, V[k.id]) +
@@ -155,6 +162,10 @@
     const p = M.panelHTML(k, S, { harita: haritaHTML(k) });
     Panel.ac(p.html, p.renk);
     history.replaceState(null, "", "#" + id);
+    if (!V) haritaHazir.then(() => {
+      const yer = document.querySelector('#p-govde .p-harita-yer[data-id="' + k.id + '"]');
+      if (yer) yer.outerHTML = haritaHTML(k);
+    }, () => {});
   }
   rows.addEventListener("click", e => {
     if (e.target.closest("a")) return;   // satırdaki parti bağlantısı soyağacına gider

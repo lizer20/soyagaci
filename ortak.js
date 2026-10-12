@@ -94,5 +94,19 @@
     return { ac, kapat, odakHedefi, acikMi };
   }
 
-  return { tarihYaz, yuzde, yuzdeYaz, sayiYaz, hashOku, bantDurum, bantKur, panelKur };
+  /* ---- sonradan yüklenen veri dosyası: fetch değil <script> olduğu için file:// üzerinde de çalışır.
+     Aynı dosya bir kez yüklenir; sıra gerekiyorsa sözler zincirlenir. ---- */
+  const yuklenenler = {};
+  function betikYukle(src) {
+    if (!yuklenenler[src]) yuklenenler[src] = new Promise((tamam, hata) => {
+      const b = document.createElement("script");
+      b.src = src;
+      b.onload = () => tamam();
+      b.onerror = () => { delete yuklenenler[src]; hata(new Error(src + " yüklenemedi")); };
+      document.head.appendChild(b);
+    });
+    return yuklenenler[src];
+  }
+
+  return { tarihYaz, yuzde, yuzdeYaz, sayiYaz, hashOku, bantDurum, bantKur, panelKur, betikYukle };
 });
