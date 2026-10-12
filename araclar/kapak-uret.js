@@ -16,7 +16,7 @@ const KARTLAR = [
     baslik: "Türkiye Siyasi Partileri Soyağacı", alt: "Süreklilikler, bölünmeler, birleşmeler ve kapatmalar tek şemada.",
     sayfa: "index.html", kaydir: 900 },
   { ad: "sandik", ust: secimSayisi + " seçim ve referandum · " + hukumetSayisi + " hükümet", baslik: "Sandık",
-    alt: "1923'ten bugüne seçimler, referandumlar ve hükümetler tek kronolojide.", sayfa: "sandik.html", kaydir: 2200 },
+    alt: "1923'ten bugüne seçimler, referandumlar ve hükümetler tek kronolojide.", sayfa: "sandik.html", kaydirOge: "#bant-3" },
   { ad: "harita", ust: Object.keys(w.IL_SONUCLARI).length + " harita · il il sonuçlar", baslik: "Harita",
     alt: "Seçimlerde il il kazanan partiler, referandumlarda illerin evet ya da hayır oyu.",
     sayfa: "harita.html#2023-05-genel", oge: ".h-harita", harita: true }];
@@ -28,7 +28,12 @@ const KARTLAR = [
     await p.goto(dosya(k.sayfa)); await p.waitForTimeout(900);
     k.resim = path.join(GECICI, k.ad + ".png");
     if (k.oge) await (await p.$(k.oge)).screenshot({ path: k.resim });
-    else { await p.evaluate(y => window.scrollTo(0, y), k.kaydir); await p.waitForTimeout(300); await p.screenshot({ path: k.resim }); }
+    else {
+      // kaydirOge: o öğenin başı ekranın üstüne gelecek kadar kaydırılır (düzen değişse de aynı yer görünür)
+      if (k.kaydirOge) await p.evaluate(s => window.scrollTo(0, document.querySelector(s).getBoundingClientRect().top + scrollY - 8), k.kaydirOge);
+      else await p.evaluate(y => window.scrollTo(0, y), k.kaydir);
+      await p.waitForTimeout(300); await p.screenshot({ path: k.resim });
+    }
   }
   const c = await b.newPage({ viewport: { width: 1200, height: 630 } });
   for (const k of KARTLAR) {
