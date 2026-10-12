@@ -10,7 +10,7 @@
   r.bos = document.querySelectorAll(".s-bos").length;
   const d = document.querySelector('.tur-dugme[data-tur="hukumet"]');
   d.click();
-  r.hukumetKapali = { gizli: [...document.querySelectorAll(".s-oge-serit")].every(x => x.hidden),
+  r.hukumetKapali = { gizli: [...document.querySelectorAll('.s-oge[data-tur="hukumet"]')].every(x => x.hidden),
                       basili: d.getAttribute("aria-pressed") };
   d.click();
   const y = document.getElementById("yilKaydirici");
