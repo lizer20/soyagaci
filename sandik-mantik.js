@@ -578,12 +578,14 @@
     }
 
     /* ---- soyağacı künyesi: partinin girdiği seçimler ---- */
+    // aynı yıl aynı türde iki seçim varsa (2015 genel gibi) yılın önüne ay yazılır
+    function yilEtiketi(k, S) {
+      const ayniYil = S.secimler.filter(x => x.tur === k.tur && x.tarih.slice(0, 4) === k.tarih.slice(0, 4));
+      return ayniYil.length > 1 ? O.tarihYaz(k.tarih, true).replace(/^\d+ /, "") : k.tarih.slice(0, 4);
+    }
     function kunyeSecimleriHTML(id, S) {
       const s = partininSecimleri(id, S);
-      const etiket = k => {
-        const ayniYil = S.secimler.filter(x => x.tur === k.tur && x.tarih.slice(0, 4) === k.tarih.slice(0, 4));
-        return ayniYil.length > 1 ? O.tarihYaz(k.tarih, true).replace(/^\d+ /, "") : k.tarih.slice(0, 4);
-      };
+      const etiket = k => yilEtiketi(k, S);
       const bag = k => '<a class="p-git" href="sandik.html#' + k.id + '">' + etiket(k) + "</a>";
       // bilinmeyen oy ya da sandalye yazılmaz
       const yuzdeVarsa = (s, k) => oyDegeri(s, k) != null ? O.yuzdeYaz(oyDegeri(s, k)) : null;
@@ -613,7 +615,7 @@
     function haritaKunyeHTML(id, S, V) {
       const l = birinciIller(id, S, V);
       return liste("Haritada birinci çıktığı iller", l.map(x => '<li><a class="p-git" href="harita.html#' + x.kayit.id + '">' +
-        x.kayit.tarih.slice(0, 4) + " " + (x.kayit.tur === "genel" ? "genel" : "yerel") + "</a><span>" +
+        yilEtiketi(x.kayit, S) + " " + (x.kayit.tur === "genel" ? "genel" : "yerel") + "</a><span>" +
         O.sayiYaz(x.il) + " il" + (x.kayit.tur === "yerel" ? " (il merkezi)" : "") + "</span></li>"));
     }
 

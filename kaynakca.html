@@ -25,8 +25,24 @@
 <link rel="stylesheet" href="ortak.css">
 <style>
   /* Bu sayfaya özel stiller. Fontlar, tasarım tokenları, üst menü ve temel tipografi ortak.css içinde. */
-  main{max-width:1100px;margin:0 auto}
-  section{max-width:68ch;margin:0 0 38px}
+  main{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:minmax(0,68ch) minmax(0,1fr);column-gap:56px}
+  section{grid-column:1;max-width:68ch;margin:0 0 38px;scroll-margin-top:16px}
+
+  /* içindekiler: masaüstünde sağda sabit, dar ekranda başta */
+  .icindekiler{grid-column:2;grid-row:1 / span 30;align-self:start;position:sticky;top:18px;
+    max-width:250px;padding:2px 0 2px 16px;border-left:1px solid var(--cizgi)}
+  .ic-et{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--soluk);margin-bottom:8px}
+  .icindekiler ol{list-style:none;margin:0;padding:0}
+  .icindekiler li{margin:0 0 6px;font-size:13px;line-height:1.35}
+  .icindekiler a{color:#3A3E32;text-decoration:none}
+  .icindekiler a:hover{color:var(--murekkep);text-decoration:underline;text-decoration-color:var(--cizgi);text-underline-offset:3px}
+  @media (max-width:980px){
+    main{display:block}
+    .icindekiler{position:static;max-width:none;margin:0 0 30px;padding:12px 14px;border:1px solid var(--cizgi);background:var(--kart)}
+    .icindekiler ol{columns:2;column-gap:24px}
+  }
+  @media (max-width:560px){ .icindekiler ol{columns:1} .icindekiler li{margin-bottom:9px} }
   section h2{
     font-family:"Fraunces",serif;font-weight:700;font-size:19px;
     margin:0 0 12px;letter-spacing:-.01em;color:var(--murekkep);
@@ -84,7 +100,22 @@
   </header>
 
   <main>
-    <section>
+    <nav class="icindekiler" aria-label="İçindekiler">
+      <div class="ic-et">bu sayfada</div>
+      <ol>
+        <li><a href="#siniflandirma">Sınıflandırma ilkesi</a></li>
+        <li><a href="#baglantilar">Bağlantı türleri</a></li>
+        <li><a href="#rozetler">Durum rozetleri</a></li>
+        <li><a href="#yerlestirme">Yerleştirme kuralları</a></li>
+        <li><a href="#kapsam">Kapsam ve sınırlar</a></li>
+        <li><a href="#sandik">Sandık: ölçüler ve kurallar</a></li>
+        <li><a href="#harita">Harita: il il sonuçlar</a></li>
+        <li><a href="#dogrulama">Bilgi doğrulama ilkesi</a></li>
+        <li><a href="#kaynaklar">Bu tür bilgiler nereden doğrulanabilir</a></li>
+        <li><a href="#hata">Hata bildirme</a></li>
+      </ol>
+    </nav>
+    <section id="siniflandirma">
       <h2>Sınıflandırma ilkesi</h2>
       <p>Şemadaki yedi sütun <b>ideolojik</b> çizgiye göre ayrılmıştır, kimliğe (etnik, dinî
         vb.) göre değil. Örneğin HEP'ten DEM Parti'ye uzanan hat ayrı bir "Kürt siyasi
@@ -96,7 +127,7 @@
         anahtar gibi yaygın bilinen semboller yalnızca yazıyla belirtilir.</p>
     </section>
 
-    <section>
+    <section id="baglantilar">
       <h2>Bağlantı türleri</h2>
       <dl class="terim">
         <dt>devam</dt><dd>Doğrudan halefiyet: isim değişikliği, yeniden açılma. Şemada düz çizgi.</dd>
@@ -109,7 +140,7 @@
         Görüş'e çizgi çekilmemiştir.</p>
     </section>
 
-    <section>
+    <section id="rozetler">
       <h2>Durum rozetleri</h2>
       <dl class="terim">
         <dt>kapatıldı</dt><dd>Yargı kararı veya darbeyle sona erdi. Kart taralı zemin alır.</dd>
@@ -119,7 +150,7 @@
       </dl>
     </section>
 
-    <section>
+    <section id="yerlestirme">
       <h2>Yerleştirme kuralları</h2>
       <ul>
         <li>Parti <b>kurulduğu</b> dönem bandına konur, faaliyeti sonraki yıllara uzasa da.</li>
@@ -131,7 +162,7 @@
       </ul>
     </section>
 
-    <section>
+    <section id="kapsam">
       <h2>Kapsam ve sınırlar</h2>
       <p>Meclise girmiş, kapatılmış ya da bir geleneğin halkası olan partiler alınmıştır;
         Türkiye'de kurulmuş yüzlerce partinin tamamı değil. Şema bir siyasi tarih özetidir,
@@ -143,24 +174,26 @@
       <p>Sandık bölümü 1923'ten bugüne genel seçimleri, bulunabilen en eski belediye seçiminden
         (1930) bugüne yerel seçimleri, referandumları, cumhurbaşkanlığı seçimlerini (TBMM'de ve halk
         oylamasıyla yapılanları), milletvekili ara seçimlerini ve hükümetleri tek kronolojide gösterir.
-        Yerel ara seçimler kapsam dışıdır; tek istisna 2019 İstanbul yenileme seçimidir. İl il harita
-        henüz yoktur.</p>
-      <p class="ilke">"—" işareti, o sayının en az bir resmî ve bir ikinci kaynakta birbiriyle
-        eşleşerek bulunamadığı anlamına gelir. Tahmin, yuvarlama ya da aralık yazılmaz; kaydın geri
-        kalanı yerinde durur.</p>
+        Yerel ara seçimler kapsam dışıdır; tek istisna 2019 İstanbul yenileme seçimidir. İl il sonuçlar
+        <a href="harita.html">Harita</a> sayfasındadır.</p>
+      <p class="ilke">En az bir resmî ve bir ikinci kaynakta birbiriyle eşleşerek bulunamayan sayı
+        yazılmaz: tablo hücresi boş kalır, hiçbir değeri bilinmeyen satır ya da sütun hiç gösterilmez.
+        Tahmin, yuvarlama ya da aralık yazılmaz; kaydın geri kalanı yerinde durur. Ayrıntılı sonucu
+        bulunamayan seçimler (ör. 1930–1955 yerel seçimleri) kart yerine tek satır olarak görünür;
+        bilinenler pencerede yazılıdır.</p>
       <dl class="terim">
-        <dt>kazandı</dt><dd>Birinci parti sandalyelerin yarısından fazlasını aldıysa "kazandı · tek başına iktidar"; aksi halde "birinci parti". Genel seçimde sıralama oya değil sandalyeye göredir.</dd>
+        <dt>kazandı</dt><dd>Birinci parti sandalyelerin yarısından fazlasını aldıysa "kazandı · tek başına iktidar"; aksi halde "birinci parti". Genel seçimde sıralama oya değil sandalyeye göredir; yerel seçimde "birinci parti" belediye meclisi oyuna göredir.</dd>
         <dt>ittifak</dt><dd>YSK'nın resmî liste sonucu esas alınır. Bir partinin adayları başka bir partinin listesinden seçildiyse bu, liste sonucunun altında ayrıca belirtilir.</dd>
         <dt>diğer</dt><dd>Oyu %1'in altında kalan ve soyağacında yer almayan partiler çoğu kayıtta tek satırda toplanır ve kaç partinin toplandığı yazılır; daha önce meclise girmiş olanlar ayrı satırda kalır.</dd>
         <dt>yerel oy</dt><dd>Ülke geneli oy oranı belediye meclisi oylarından hesaplanır. Bütün yıllarda aynı ölçü kullanılsın diye il genel meclisi ya da belediye başkanlığı oylarıyla karıştırılmaz; büyükşehirlerde yalnızca belediye başkanlığını kazanan parti gösterilir.</dd>
         <dt>tutum</dt><dd>Referandumda partinin resmî tavrı: evet, hayır, boykot ya da serbest (resmî tavır almadı ya da üyelerini serbest bıraktı). Kaynakla doğrulanamayan tutum yazılmaz.</dd>
-        <dt>hesaplanan</dt><dd>Resmî kaynak yalnızca il il sayı verdiyse ulusal toplam il satırlarından hesaplanır ve ikinci bir kaynağın ulusal rakamıyla eşleşmesi aranır; eşleşmezse "—" yazılır.</dd>
+        <dt>hesaplanan</dt><dd>Resmî kaynak yalnızca il il sayı verdiyse ulusal toplam il satırlarından hesaplanır ve ikinci bir kaynağın ulusal rakamıyla eşleşmesi aranır; eşleşmezse sayı yazılmaz.</dd>
       </dl>
       <ul>
         <li>Veride ham sayılar (kayıtlı seçmen, kullanılan ve geçerli oy, parti oyu) tutulur; yüzdeler
           bunlardan hesaplanır. Yalnızca yüzde yayımlanmış seçimlerde yayımlanan yüzde kullanılır.</li>
         <li>İki kaynak arasındaki fark %0,5'e kadarsa sayılar eşleşmiş kabul edilir ve resmî kaynağın
-          sayısı yazılır; fark daha büyükse "—" yazılır.</li>
+          sayısı yazılır; fark daha büyükse sayı yazılmaz.</li>
         <li>1946 seçimi "açık oy, gizli tasnif" usulüyle yapıldı.</li>
         <li>1963 öncesi yerel seçimler bulunabildiği kadarıyla alınmıştır; bu kayıtlarda ülke geneli
           oy ve seçmen sayıları çoğunlukla yoktur.</li>
@@ -250,7 +283,7 @@
       </ul>
     </section>
 
-    <section>
+    <section id="dogrulama">
       <h2>Bilgi doğrulama ilkesi</h2>
       <p class="ilke">Bilgi uydurulmaz. Bir partinin akıbeti net değilse şemada tahmini bir
         tarih ya da rozet gösterilmez — belirsizlik, bilgi bulununcaya kadar şemadan
@@ -260,7 +293,7 @@
         kolaylaştıran kısa bağlam notlarıdır.</p>
     </section>
 
-    <section>
+    <section id="kaynaklar">
       <h2>Bu tür bilgiler nereden doğrulanabilir</h2>
       <p>Aşağıdaki liste şemadaki belirli bir iddianın dipnotu değildir — kuruluş/kapanış
         tarihi, kapatma kararı ya da birleşme gibi bilgilerin genel olarak hangi türden
@@ -276,7 +309,7 @@
       </ul>
     </section>
 
-    <section>
+    <section id="hata">
       <h2>Hata bildirme</h2>
       <p>Bu şema tek bir kişi tarafından derlenen, zaman zaman güncellenen bir çalışmadır.
         Bir tarihte, sınıflandırmada ya da bağlantıda hata görürseniz düzeltilmesi
