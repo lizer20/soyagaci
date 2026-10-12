@@ -62,7 +62,7 @@
       // paneli açan öğeyi hatırla; panel içinden gelindiyse öncekini koru
       const a = document.activeElement;
       const k = a && a.closest ? a.closest(o.odakSecici) : null;
-      if (k) sonOdak = k;
+      if (k && !o.panel.contains(k)) sonOdak = k;
       o.panel.removeAttribute("inert");
       o.panel.removeAttribute("aria-hidden");
       o.panel.classList.add("acik"); o.perde.classList.add("acik");

@@ -39,9 +39,9 @@ Yapılmayacaklar (şimdilik): 1 (ana sitenin site haritası), 7 (genel başkan l
 - [x] 11 Site denetim aracı (`araclar/denetim/site.js`, ~1,5 dk)
 - [x] 12 Otomatik test (`.github/workflows/denetim.yml`; ilk iki çalıştırma yeşil)
 - [x] 13 Hızlı açılış (`content-visibility` + `kaydir()`; 4x yavaş işlemcide açılış 966→~600 ms, donma 618→~250 ms)
-- [ ] 3 Hükümet penceresi
-- [ ] 4 Sandık'ta arama
-- [ ] 5 Hükümette geçen süre
+- [x] 3 Hükümet penceresi (`hukumetPanelHTML`, adres `#hukumet-57`, numarasızlar `#hukumet-2018-07-09`)
+- [x] 4 Sandık'ta arama (`aramaMetni`/`aramaEslesir`; Türkçe harf sadeleştirme)
+- [x] 5 Hükümette geçen süre (`partiHukumetleriHTML`; kaynakça "süre" maddesi)
 - [ ] 6 İttifak vekil sayıları
 - [ ] 8 Küçük açık kalemler
 - [ ] 2 Eski adres yönlendirmesi

@@ -305,10 +305,10 @@ test("hükümet satırı: yaygın adı numaranın yanında, öne çıkan hüküm
   const sade = M.hukumetSatiriHTML(F.hukumetler[1]);
   assert.doesNotMatch(sade, /s-lakap|s-onemli/);
   const h = M.hukumetSatiriHTML(Object.assign({}, F.hukumetler[0], { lakap: "ANASOL-M", onemli: true }));
-  assert.match(h, /class="s-olay s-hukumet s-onemli"/);
-  assert.match(h, /57\. Hükümet<\/b><\/span><span class="s-o-ana"><span class="s-lakap">ANASOL-M<\/span> /);
+  assert.match(h, /class="s-olay s-hukumet s-ac s-onemli" data-id="hukumet-57"/);
+  assert.match(h, /57\. Hükümet<\/button><\/span><span class="s-o-ana"><span class="s-lakap">ANASOL-M<\/span> /);
   const k = M.hukumetSatiriHTML(Object.assign({}, F.hukumetler[0], { lakap: "A<B" }));
-  assert.match(k, /class="s-olay s-hukumet"/);
+  assert.match(k, /class="s-olay s-hukumet s-ac"/);
   assert.match(k, /A&lt;B/);
 });
 
@@ -339,8 +339,8 @@ test("zaman çizelgesi: kart/satır ayrımı, yıl grupları ve hükümet satır
   const g = M.yilGruplari([{ tarih: "1999-04-18" }, { tarih: "1999-05-28" }, { tarih: "2002-11-03" }, { tarih: "1999-12-01" }]);
   assert.deepEqual(g.map(x => [x.yil, x.ogeler.length]), [["1999", 2], ["2002", 1], ["1999", 1]]);
   const h = M.hukumetSatiriHTML(Object.assign({}, F.hukumetler[0], { lakap: "ANASOL-D", onemli: true }));
-  assert.match(h, /class="s-olay s-hukumet s-onemli"/);
-  assert.match(h, /<b>57\. Hükümet<\/b>/);
+  assert.match(h, /class="s-olay s-hukumet s-ac s-onemli"/);
+  assert.match(h, /<button type="button" class="s-hk-ac">57\. Hükümet<\/button>/);
   assert.match(h, /<span class="s-lakap">ANASOL-D<\/span>/);
   assert.match(h, /href="index\.html#dsp"/);
   assert.match(h, /→ 18 Kas 2002/);
@@ -370,4 +370,60 @@ test("yıl ekleri okunuşa göre: 1955'ten, 1966'dan, 2002'ye, 1958'e, 1990'dan,
   for (const x of den) assert.equal(M.yilEki(+x.slice(0, 4), "den"), x);
   const e = ["1958'e", "2002'ye", "1993'e", "2009'a", "2025'e", "1966'ya", "1990'a", "1970'e", "2000'e", "1950'ye", "1961'e", "1940'a"];
   for (const x of e) assert.equal(M.yilEki(+x.slice(0, 4), "e"), x);
+});
+
+test("süre: takvime göre yıl/ay/gün ve toplam gün", () => {
+  assert.deepEqual(M.sure("1999-05-28", "2002-11-18"), { y: 3, m: 5, d: 21, gun: 1270 });
+  assert.equal(M.sureYaz(M.sure("1995-10-05", "1995-10-30")), "25 gün");
+  assert.equal(M.sureYaz(M.sure("2000-01-31", "2000-03-01")), "1 ay 1 gün");
+  assert.equal(M.sureYaz(M.sure("2000-01-01", "2001-01-01")), "1 yıl");
+  assert.equal(M.gunYaz(1270), "3 yıl 5 ay");
+  assert.equal(M.gunYaz(20), "20 gün");
+});
+
+test("hükümet penceresi: ad, kişi, süre, partiler, bitiş, not ve bağlantılar", () => {
+  const S = structuredClone(F);
+  S.hukumetler[0].not = "Not <x>"; S.hukumetler[0].lakap = "ANASOL-M";
+  const { html, renk } = M.hukumetPanelHTML(S.hukumetler[0], S);
+  assert.match(html, /id="p-kisa">57\. Hükümet</);
+  assert.match(html, /<span class="p-lakap">ANASOL-M<\/span>Başbakan A/);
+  assert.match(html, /28 Mayıs 1999 – 18 Kasım 2002 · 3 yıl 5 ay 21 gün · koalisyon/);
+  assert.match(html, /Hükümetteki partiler/);
+  assert.match(html, /href="index\.html#dsp"/);
+  assert.match(html, /erken seçim kararı/);
+  assert.ok(html.includes("Not &lt;x&gt;"));
+  assert.match(html, /Önceki genel seçim<\/b><a class="p-git" href="#1999-04-genel">1999 Genel Seçimi/);
+  assert.match(html, /Sonraki hükümet<\/b><a class="p-git" href="#hukumet-58">58\. Hükümet · B/);
+  assert.doesNotMatch(html, /Önceki hükümet/);
+  assert.match(renk, /^#[0-9A-F]{6}$/i);
+  const g = M.hukumetPanelHTML(S.hukumetler[1], S).html;
+  assert.match(g, /– görevde/);
+  assert.doesNotMatch(g, /Bitiş|undefined|null/);
+  const cb = M.hukumetPanelHTML({ no: null, baskan: "C", partiler: [], baslangic: "2018-07-09", bitis: null, tip: "cumhurbaskanligi" }, { secimler: [], hukumetler: [] }).html;
+  assert.match(cb, /Cumhurbaşkanlığı Hükümeti/);
+  assert.match(cb, /Cumhurbaşkanı C/);
+  assert.equal(M.hukumetId({ no: null, baslangic: "2018-07-09" }), "hukumet-2018-07-09");
+});
+
+test("parti künyesi: yer aldığı hükümetler ve toplam süre", () => {
+  const h = M.partiHukumetleriHTML("dsp", F);
+  assert.match(h, /Yer aldığı hükümetler/);
+  assert.match(h, /1 hükümet · toplam yaklaşık 3 yıl 5 ay/);
+  assert.match(h, /href="sandik\.html#hukumet-57">57\. Hükümet<\/a><span>A · 1999–2002/);
+  const g = M.partiHukumetleriHTML("akp", F);
+  assert.match(g, /1 hükümet \(görevdeki hükümet hariç\)/);
+  assert.equal(M.partiHukumetleriHTML("tcf", F), "");
+});
+
+test("arama: Türkçe harfler sadeleşir, her sözcük eşleşmeli; kayıt ve hükümet metinleri", () => {
+  assert.equal(M.aramaNormal("Özal ŞIĞ İnönü"), "ozal sig inonu");
+  const k = M.aramaMetni(kayit("1999-04-genel"));
+  assert.ok(M.aramaEslesir(k, "1999 genel"));
+  assert.ok(M.aramaEslesir(k, "dsp"));
+  assert.ok(M.aramaEslesir(k, "demokratik sol"));
+  assert.ok(!M.aramaEslesir(k, "referandum"));
+  const h = M.aramaMetni(Object.assign({}, F.hukumetler[0], { basbakan: "Bülent Ecevit", lakap: "ANASOL-M" }));
+  assert.ok(M.aramaEslesir(h, "ecevit anasol"));
+  assert.ok(M.aramaEslesir(h, "BULENT"));
+  assert.ok(M.aramaEslesir(h, "57. hükümet"));
 });

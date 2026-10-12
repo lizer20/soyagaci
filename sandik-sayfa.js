@@ -1,6 +1,7 @@
 /* Sandık sayfasının DOM bağlaması.
    Gerektirir: window.PARTILER, window.SANDIK, window.Ortak, window.SandikMantik ve sayfada
-   #turlar, #yilKaydirici, #yilDeger, #filtreTemizle, #rows, #perde, #panel, #kapat, #p-govde. */
+   #turlar, #yilKaydirici, #yilDeger, #filtreTemizle, #rows, #perde, #panel, #kapat, #p-govde;
+   isteğe bağlı: #ara, #araSonuc (arama), #atla (dönem çubuğu). */
 (function () {
   const P = window.PARTILER, S = window.SANDIK, O = window.Ortak;
   const M = window.SandikMantik.olustur(P, O);
@@ -19,11 +20,11 @@
   function ogeHTML(o) {
     if (o.tur === "secim") {
       const y = o.tarih.slice(0, 4);
-      return '<div class="s-oge' + (M.genisKartMi(o.kayit) ? " s-genis" : "") + '" data-tur="' + o.kayit.tur + '" data-bas="' + y + '" data-bit="' + y + '">' +
+      return '<div class="s-oge' + (M.genisKartMi(o.kayit) ? " s-genis" : "") + '" data-k="' + o.kayit.id + '" data-tur="' + o.kayit.tur + '" data-bas="' + y + '" data-bit="' + y + '">' +
         (kartMi(o) ? M.kartHTML(o.kayit) : M.olayHTML(o.kayit)) + "</div>";
     }
     const h = o.hukumet;
-    return '<div class="s-oge" data-tur="hukumet" data-bas="' + h.baslangic.slice(0, 4) +
+    return '<div class="s-oge" data-k="' + M.hukumetId(h) + '" data-tur="hukumet" data-bas="' + h.baslangic.slice(0, 4) +
       '" data-bit="' + (h.bitis ? h.bitis.slice(0, 4) : "9999") + '">' + M.hukumetSatiriHTML(h) + "</div>";
   }
   function yillarHTML(ogeler) {
@@ -124,38 +125,58 @@
     uygula();
   });
 
+  /* ---- arama: kayıtların ve hükümetlerin aranacak metni bir kez hazırlanır; her sözcük geçmeli,
+     Türkçe harfler sadeleşir ("ozal" → Özal). Arama varken eşleşmeyenler ve boş kalan dönemler gizlenir. ---- */
+  const araKutu = document.getElementById("ara"), araSonuc = document.getElementById("araSonuc");
+  const aranacak = new Map();
+  S.secimler.forEach(k => aranacak.set(k.id, M.aramaMetni(k)));
+  S.hukumetler.forEach(h => aranacak.set(M.hukumetId(h), M.aramaMetni(h)));
+  let arama = "";
+  if (araKutu) araKutu.addEventListener("input", () => { arama = araKutu.value.trim(); uygula(); });
+
   const temizle = document.getElementById("filtreTemizle");
   temizle.addEventListener("click", () => {
     TURLER.forEach(t => acikTurler.add(t[0]));
     turlar.querySelectorAll(".tur-dugme").forEach(d => d.setAttribute("aria-pressed", "true"));
     yilFiltre = null; kaydirici.value = YMAX; yilDeger.textContent = YMAX;
+    arama = ""; if (araKutu) araKutu.value = "";
     uygula();
   });
 
   function uygula() {
+    const ara = arama.length >= 2 ? arama : "";
+    let bulunan = 0;
     rows.classList.toggle("filtreli", yilFiltre !== null);
     rows.querySelectorAll(".s-oge").forEach(el => {
-      el.hidden = !acikTurler.has(el.dataset.tur);
+      el.hidden = !acikTurler.has(el.dataset.tur) || (!!ara && !M.aramaEslesir(aranacak.get(el.dataset.k) || "", ara));
+      if (ara && !el.hidden) bulunan++;
       const tutar = yilFiltre !== null && +el.dataset.bas <= yilFiltre && yilFiltre <= +el.dataset.bit;
       el.classList.toggle("sonuc", tutar);
       const donem = el.closest(".s-donem");
-      if (tutar && !el.hidden && donem.classList.contains("kapali")) O.bantDurum(bantBul(donem), donem, false);
+      if ((tutar || ara) && !el.hidden && donem.classList.contains("kapali")) O.bantDurum(bantBul(donem), donem, false);
     });
-    // görünür öğesi kalmayan kart/satır grubu ve yıl gizlenir; boş başlık kalmasın
-    rows.querySelectorAll(".s-kartlar, .s-olaylar, .s-yil").forEach(el => {
+    // görünür öğesi kalmayan kart/satır grubu, yıl ve askerî yönetim kutusu gizlenir; boş başlık kalmasın
+    rows.querySelectorAll(".s-kartlar, .s-olaylar, .s-yil, .s-kap").forEach(el => {
       el.hidden = !el.querySelector(".s-oge:not([hidden])");
     });
     rows.querySelectorAll(".s-yil").forEach(el => {
       el.classList.toggle("sonuc", !!el.querySelector(".s-oge.sonuc:not([hidden])"));
     });
-    temizle.classList.toggle("aktif", yilFiltre !== null || acikTurler.size < TURLER.length);
+    // arama varken eşleşmesi olmayan dönem bandı ve kesinti bantları da gizlenir
+    rows.querySelectorAll(".s-donem").forEach(d => {
+      const bos = !!ara && !d.querySelector(".s-oge:not([hidden])");
+      d.hidden = bos; bantBul(d).hidden = bos;
+      d.querySelectorAll(".banner.kesinti, .s-bos").forEach(b => { b.hidden = !!ara; });
+    });
+    if (araSonuc) araSonuc.textContent = ara ? (bulunan ? bulunan + " sonuç" : "sonuç yok") : "";
+    temizle.classList.toggle("aktif", yilFiltre !== null || acikTurler.size < TURLER.length || !!ara);
   }
 
   /* ---- panel ve doğrudan bağlantı ---- */
   const Panel = O.panelKur({
     panel: document.getElementById("panel"), perde: document.getElementById("perde"),
     govde: document.getElementById("p-govde"), kapatDugmesi: document.getElementById("kapat"),
-    odakSecici: ".s-ac",
+    odakSecici: ".s-hk-ac, .s-ac",
     kapaninca: () => history.replaceState(null, "", location.pathname + location.search)
   });
   /* il haritası verisi (≈345 KB) sayfanın ilk çiziminde gerekmez: sayfa çizildikten sonra arka planda
@@ -174,6 +195,13 @@
       '<div class="p-harita-bag"><a href="harita.html#' + k.id + '">büyük haritada aç →</a></div></div>';
   }
   function ac(id) {
+    const h = S.hukumetler.find(x => M.hukumetId(x) === id);
+    if (h) {
+      const p = M.hukumetPanelHTML(h, S);
+      Panel.ac(p.html, p.renk);
+      history.replaceState(null, "", "#" + id);
+      return;
+    }
     const k = S.secimler.find(x => x.id === id); if (!k) return;
     const p = M.panelHTML(k, S, { harita: haritaHTML(k) });
     Panel.ac(p.html, p.renk);
@@ -197,6 +225,11 @@
     kap.querySelector(".h-secili").textContent = t ? t.textContent : "";
   }
   document.getElementById("p-govde").addEventListener("click", panelIl);
+  // pencere içindeki hükümet satırı o hükümetin penceresini açar
+  document.getElementById("p-govde").addEventListener("click", e => {
+    if (e.target.closest("a")) return;
+    const r = e.target.closest(".s-ac[data-id]"); if (r) ac(r.dataset.id);
+  });
   document.getElementById("p-govde").addEventListener("mouseover", panelIl);
   rows.addEventListener("keydown", e => {
     const k = e.target.closest(".s-ac");
@@ -207,8 +240,10 @@
     const el = rows.querySelector('[data-id="' + id + '"]'); if (!el) return;
     const donem = el.closest(".s-donem");
     if (donem.classList.contains("kapali")) O.bantDurum(bantBul(donem), donem, false);
-    kaydir(el, "center");
-    el.focus({ preventScroll: true });
+    if (!el.hidden && !el.closest("[hidden]")) {
+      kaydir(el, "center");
+      (el.querySelector(".s-hk-ac") || el).focus({ preventScroll: true });
+    }
     ac(id);
   }
   window.addEventListener("hashchange", hashAc);

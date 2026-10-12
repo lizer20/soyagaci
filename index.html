@@ -47,13 +47,6 @@
   .swatch.kesik{border-top-style:dashed}
   .swatch.nokta{border-top-style:dotted}
 
-  .ara-kutu{
-    font-family:"IBM Plex Sans",sans-serif;font-size:13px;color:var(--murekkep);
-    background:var(--kart);border:1px solid var(--cizgi);padding:7px 10px;
-    width:330px;max-width:60vw;
-  }
-  .ara-kutu::placeholder{color:var(--soluk)}
-  .ara-kutu:focus-visible{outline:2px solid var(--murekkep);outline-offset:1px}
 
   .kaydir-ipucu{
     max-width:1100px;margin:24px auto 8px;font-family:"IBM Plex Mono",monospace;
@@ -123,7 +116,6 @@
     .satir{display:flex;flex-direction:column;gap:10px}
     .hucre:empty{display:none}
 
-    .ara-kutu{width:100%;max-width:none}
   }
 </style>
 
@@ -417,7 +409,8 @@
       SM.genelBaskanlarHTML(id, window.GENEL_BASKANLAR)+
       (n.sembol?'<div class="p-etiket">Sembol</div><div class="p-sembol">'+n.sembol+'</div>':'')+
       (oncul.length?'<div class="p-etiket">Nereden geldi</div><ul>'+satirlar(oncul)+'</ul>':'')+
-      (ardil.length?'<div class="p-etiket">Nereye gitti</div><ul>'+satirlar(ardil)+'</ul>':'');
+      (ardil.length?'<div class="p-etiket">Nereye gitti</div><ul>'+satirlar(ardil)+'</ul>':'')+
+      SM.partiHukumetleriHTML(id, SANDIK);
     // il sonuçları (≈240 KB) yalnız bir parti penceresi açılınca yüklenir; "birinci çıktığı iller" sonra dolar
     const ilVar = !!window.IL_SONUCLARI;
     const secimler = SM.kunyeSecimleriHTML(id, SANDIK) + '<div class="p-hk" data-id="'+id+'">' +

@@ -187,7 +187,6 @@
 #panel .p-tablo td+td{text-align:right;font-family:"IBM Plex Mono",monospace;font-size:12px;white-space:nowrap;padding-left:10px}
 #panel .p-tablo td b{font-weight:600}
 #panel .p-tablo small{display:block;font-size:10.5px;color:var(--soluk)}
-#panel .p-dipnot{font-size:12px;color:var(--soluk);line-height:1.45;margin:6px 0 4px}
 #panel .cubuk{margin:6px 0 4px}
 #panel .p-konu{font-weight:500;color:var(--murekkep);margin-bottom:12px}
 #panel .p-adaylar li{justify-content:space-between}
@@ -249,3 +248,13 @@
 #turlar{flex:1 1 100%}
 /* yazdırırken bütün yıllar çizilir */
 @media print{.s-yil{content-visibility:visible}}
+
+/* hükümet satırı: numara düğmesi (klavyeyle pencere açılır), satırın tamamı tıklanabilir */
+.s-hk-ac{background:none;border:0;padding:0;margin:0;font:inherit;font-weight:600;color:inherit;cursor:pointer;text-align:left}
+.s-hk-ac:focus-visible{outline:2px solid var(--murekkep);outline-offset:2px}
+.s-hukumet.s-ac:hover .s-hk-ac{text-decoration:underline;text-decoration-color:var(--cizgi);text-underline-offset:3px}
+#panel .p-lakap{font-family:"Fraunces",serif;font-weight:700;font-size:16px;color:var(--murekkep);margin-right:9px}
+.p-olaylar .s-olay.s-ac:hover{background:#ECECE4}
+/* arama */
+.s-ara-sonuc{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--soluk);min-width:5em}
+.s-ara-sonuc:empty{display:none}

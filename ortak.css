@@ -125,6 +125,15 @@
   }
   .yil-filtre input[type=range]{width:170px;accent-color:var(--murekkep)}
   .yil-deger{font-weight:600;color:var(--murekkep);min-width:32px;display:inline-block}
+  /* arama kutusu (Soyağacı ve Sandık) */
+  .ara-kutu{
+    font-family:"IBM Plex Sans",sans-serif;font-size:13px;color:var(--murekkep);
+    background:var(--kart);border:1px solid var(--cizgi);padding:7px 10px;
+    width:330px;max-width:60vw;
+  }
+  .ara-kutu::placeholder{color:var(--soluk)}
+  .ara-kutu:focus-visible{outline:2px solid var(--murekkep);outline-offset:1px}
+
   /* tür düğmeleri (Sandık ve Harita) */
   .turlar{display:flex;flex-wrap:wrap;gap:6px}
   .tur-dugme{
@@ -238,6 +247,8 @@
   #panel li span{color:var(--soluk);font-size:11.5px}
   #panel li i{width:8px;height:8px;border-radius:50%;flex:none;align-self:center}
   #panel li .p-bnot{display:block;font-style:normal;font-size:11px;line-height:1.4;margin-top:2px}
+  #panel .p-dipnot{font-size:12px;color:var(--soluk);line-height:1.45;margin:6px 0 4px}
+  #panel .p-hk-ozet{font-size:13px;margin-bottom:2px}
   .p-git{
     background:none;border:none;padding:0;cursor:pointer;text-align:left;
     font:inherit;color:#2A2E22;font-weight:600;text-decoration:underline;
@@ -258,6 +269,7 @@
     #panel.acik{transform:translateY(0)}
 
     .araclar{gap:12px}
+    .ara-kutu{width:100%;max-width:none}
     .yil-filtre{width:100%}
     .yil-filtre input[type=range]{flex:1;height:32px}
   }

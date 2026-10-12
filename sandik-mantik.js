@@ -435,16 +435,109 @@
     function bitisNedeni(h) {
       return h.bitisNedeni ? kacis(BITIS_ETIKET[h.bitisNedeni]) + (h.bitisNedeni === "diger" && h.not ? " — " + kacis(h.not) : "") : "";
     }
+    // hükümetin adres kimliği: numaralı olanlar "hukumet-57", numarasızlar (cumhurbaşkanlığı) başlangıç tarihiyle
+    function hukumetId(h) { return "hukumet-" + (h.no != null ? h.no : h.baslangic); }
+    function hukumetAdi(h) { return h.no != null ? h.no + ". Hükümet" : h.tip === "cumhurbaskanligi" ? "Cumhurbaşkanlığı Hükümeti" : "Hükümet"; }
     function hukumetSatiriHTML(h) {
-      const no = h.no != null ? h.no + ". Hükümet" : "Hükümet";
       const neden = bitisNedeni(h);
-      return '<div class="s-olay s-hukumet' + (h.onemli ? " s-onemli" : "") + '" style="--aile:' + hukumetRengi(h) + '">' +
-        '<span class="s-o-tarih">' + O.tarihYaz(h.baslangic, true) + '</span><span class="s-o-tur"><b>' + no + "</b></span>" +
+      // satırın tamamı tıklanınca pencere açılır; klavyede odak numaradaki düğmeye gelir (satırdaki parti bağlantıları ayrı)
+      return '<div class="s-olay s-hukumet s-ac' + (h.onemli ? " s-onemli" : "") + '" data-id="' + hukumetId(h) + '" style="--aile:' + hukumetRengi(h) + '">' +
+        '<span class="s-o-tarih">' + O.tarihYaz(h.baslangic, true) + '</span><span class="s-o-tur"><button type="button" class="s-hk-ac">' +
+        (h.no != null ? h.no + ". Hükümet" : "Hükümet") + "</button></span>" +
         '<span class="s-o-ana">' + (h.lakap ? '<span class="s-lakap">' + kacis(h.lakap) + "</span> " : "") +
         '<span class="s-o-kisi">' + kacis(h.basbakan || h.baskan) + "</span>" +
         '<span class="s-o-partiler">' + hukumetPartileri(h) + "</span></span>" +
         '<span class="s-o-son">' + (h.bitis ? "→ " + O.tarihYaz(h.bitis, true) : '<b class="s-gorevde">görevde</b>') +
         (neden ? '<span class="s-o-neden">' + neden + "</span>" : "") + "</span></div>";
+    }
+
+    /* ---- süre: iki tarih arasındaki yıl / ay / gün (takvime göre) ---- */
+    function sure(bas, bit) {
+      const a = bas.split("-").map(Number), b = bit.split("-").map(Number);
+      const gunu = (y, m, d) => Date.UTC(y, m - 1, d) / 864e5;
+      // tam ay sayısı: başlangıca ay eklenir (ayın son gününü aşan gün o ayın son gününe çekilir), kalan günler sayılır
+      let ay = (b[0] - a[0]) * 12 + (b[1] - a[1]);
+      const ekle = n => { const y = a[0] + Math.floor((a[1] - 1 + n) / 12), m = (a[1] - 1 + n) % 12 + 1;
+        return gunu(y, m, Math.min(a[2], new Date(Date.UTC(y, m, 0)).getUTCDate())); };
+      if (ekle(ay) > gunu(b[0], b[1], b[2])) ay--;
+      return { y: Math.floor(ay / 12), m: ay % 12, d: Math.round(gunu(b[0], b[1], b[2]) - ekle(ay)),
+               gun: Math.round(gunu(b[0], b[1], b[2]) - gunu(a[0], a[1], a[2])) };
+    }
+    function sureYaz(x) {
+      const p = [x.y ? x.y + " yıl" : "", x.m ? x.m + " ay" : "", x.d ? x.d + " gün" : ""].filter(Boolean);
+      return p.length ? p.join(" ") : "1 günden kısa";
+    }
+    // toplam gün sayısı yaklaşık yıl/ay olarak (ör. partinin hükümette geçirdiği toplam süre)
+    function gunYaz(gun) {
+      const y = Math.floor(gun / 365.2425), m = Math.floor((gun - y * 365.2425) / 30.436875);
+      return [y ? y + " yıl" : "", m ? m + " ay" : ""].filter(Boolean).join(" ") || gun + " gün";
+    }
+
+    function hukumetPanelHTML(h, S) {
+      const i = S.hukumetler.indexOf(h), once = S.hukumetler[i - 1], sonra = S.hukumetler[i + 1];
+      const secim = S.secimler.filter(k => k.tur === "genel" && k.tarih <= h.baslangic).pop();
+      const kisi = h.basbakan ? "Başbakan " + kacis(h.basbakan) : h.baskan ? "Cumhurbaşkanı " + kacis(h.baskan) : "";
+      let x = '<div class="p-kisa" id="p-kisa">' + hukumetAdi(h) + "</div>";
+      x += '<div class="p-ad">' + (h.lakap ? '<span class="p-lakap">' + kacis(h.lakap) + "</span>" : "") + kisi + "</div>";
+      x += meta([O.tarihYaz(h.baslangic) + " – " + (h.bitis ? O.tarihYaz(h.bitis) : "görevde"),
+        h.bitis ? sureYaz(sure(h.baslangic, h.bitis)) : null, kacis(TIP_ETIKET[h.tip] || "")]);
+      if (h.partiler && h.partiler.length)
+        x += liste(h.partiler.length > 1 ? "Hükümetteki partiler" : "Hükümetteki parti", h.partiler.map(p => {
+          const a = partiAdi({ parti: p });
+          return '<li><i style="background:' + a.renk + '"></i>' + partiBag(p) + "<span>" + kacis(a.ad) + "</span></li>";
+        }));
+      if (h.bitis) x += '<div class="p-etiket">Bitiş</div><div class="p-ozet">' + O.tarihYaz(h.bitis) +
+        (h.bitisNedeni ? " · " + bitisNedeni(h) : "") + "</div>";
+      if (h.not && h.bitisNedeni !== "diger") x += '<div class="p-etiket">Not</div><div class="p-ozet">' + kacis(h.not) + "</div>";
+      const bag = (etiket, hedef, metin) => '<li><b>' + etiket + '</b><a class="p-git" href="#' + hedef + '">' + metin + "</a></li>";
+      const l = [secim ? bag("Önceki genel seçim", secim.id, secim.tarih.slice(0, 4) + " Genel Seçimi") : "",
+        once ? bag("Önceki hükümet", hukumetId(once), hukumetAdi(once) + " · " + kacis(once.basbakan || once.baskan)) : "",
+        sonra ? bag("Sonraki hükümet", hukumetId(sonra), hukumetAdi(sonra) + " · " + kacis(sonra.basbakan || sonra.baskan)) : ""].filter(Boolean);
+      x += liste("Bağlantılar", l);
+      return { html: x, renk: hukumetRengi(h) };
+    }
+
+    /* ---- soyağacı künyesi: partinin yer aldığı hükümetler ve toplam süre ---- */
+    function partiHukumetleriHTML(id, S) {
+      const l = S.hukumetler.filter(h => (h.partiler || []).includes(id));
+      if (!l.length) return "";
+      const biten = l.filter(h => h.bitis), gun = biten.reduce((t, h) => t + sure(h.baslangic, h.bitis).gun, 0);
+      const ozet = l.length + " hükümet" + (biten.length ? " · toplam yaklaşık " + gunYaz(gun) : "") +
+        (biten.length < l.length ? " (görevdeki hükümet hariç)" : "");
+      return '<div class="p-etiket">Yer aldığı hükümetler</div><div class="p-ozet p-hk-ozet">' + ozet + "</div><ul>" +
+        l.map(h => '<li><a class="p-git" href="sandik.html#' + hukumetId(h) + '">' + hukumetAdi(h) + "</a><span>" +
+          kacis(h.basbakan || h.baskan) + " · " + h.baslangic.slice(0, 4) + (h.bitis && h.bitis.slice(0, 4) !== h.baslangic.slice(0, 4) ? "–" + h.bitis.slice(0, 4) : "") +
+          (h.lakap ? " · " + kacis(h.lakap) : "") + "</span></li>").join("") + "</ul>" +
+        // 2018'den beri kabineyi cumhurbaşkanı atıyor; veride bu hükümetlerin partisi yok, o yüzden sayılmaz
+        (parti(id) && parti(id).durum === "faal" && S.hukumetler.some(h => h.tip === "cumhurbaskanligi")
+          ? '<div class="p-dipnot">2018\'den beri kurulan cumhurbaşkanlığı hükümetleri bir partinin hükümeti olarak kaydedilmediği için bu listede yok.</div>' : "");
+    }
+
+    /* ---- arama: kayıt başına aranacak metin (Türkçe harfler sadeleştirilir: "ozal" → Özal) ---- */
+    function aramaNormal(t) {
+      return String(t || "").toLocaleLowerCase("tr").replace(/[çğıöşüâîû]/g, c => ({ ç: "c", ğ: "g", ı: "i", ö: "o", ş: "s", ü: "u", â: "a", î: "i", û: "u" })[c]);
+    }
+    function partiMetni(p) { const n = parti(p); return n ? [p, n.kisa, n.ad].join(" ") : p; }
+    function aramaMetni(x) {
+      const l = [];
+      if (x.baslangic) {   // hükümet
+        l.push(hukumetAdi(x), x.no != null ? x.no + " hukumet" : "", x.basbakan, x.baskan, x.lakap, TIP_ETIKET[x.tip], x.not,
+          O.tarihYaz(x.baslangic), x.bitis ? O.tarihYaz(x.bitis) : "", ...(x.partiler || []).map(partiMetni));
+      } else {
+        l.push(TUR_AD[x.tur], TUR_ETIKET[x.tur], O.tarihYaz(x.tarih), x.konu, x.bolge, x.kapsam, x.secilen, x.not,
+          ...(x.sonuc || []).map(s => s.parti ? partiMetni(s.parti) : s.ad),
+          ...((x.belediye && x.belediye.sonuc) || []).map(s => s.parti ? partiMetni(s.parti) : s.ad),
+          ...Object.values(x.buyuksehir || {}).map(b => [b.parti ? partiMetni(b.parti) : "", b.aday].join(" ")),
+          ...(x.ittifak || []).map(it => [it.ad, partiMetni(it.liste), ...it.icinden.map(i => partiMetni(i.parti))].join(" ")),
+          ...(x.turlar || []).flatMap(t => t.adaylar.map(a => [a.ad, a.parti ? partiMetni(a.parti) : a.destek].join(" "))),
+          ...(x.tutumlar || []).map(t => partiMetni(t.parti)));
+      }
+      return aramaNormal(l.filter(Boolean).join(" "));
+    }
+    // her sözcük metinde geçmeli
+    function aramaEslesir(metin, sorgu) {
+      const s = aramaNormal(sorgu).split(/\s+/).filter(Boolean);
+      return s.every(w => metin.includes(w));
     }
 
     function liste(baslik, satirlar) {
@@ -636,7 +729,8 @@
              partiAdi, oyDegeri, katilimDegeri, siralaGenel, baslikGenel, meclisDurumu,
              donemBul, kronoloji, sonrakiHukumetler, partininSecimleri,
              kacis, rozetHTML, genelBaskanlarHTML, cubukHTML, meclisGruplari, meclisSVG, kartHTML, panelHTML, kunyeSecimleriHTML,
-             kartMi, genisKartMi, yilGruplari, olayHTML, hukumetSatiriHTML,
+             kartMi, genisKartMi, yilGruplari, olayHTML, hukumetSatiriHTML, hukumetId, hukumetPanelHTML,
+             sure, sureYaz, gunYaz, partiHukumetleriHTML, aramaNormal, aramaMetni, aramaEslesir,
              birinciIller, haritaKunyeHTML, yilEki };
   }
   return { olustur };
