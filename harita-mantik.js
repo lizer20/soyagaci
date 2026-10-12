@@ -173,15 +173,19 @@
         return '<table class="h-tablo"><thead><tr><th scope="col">İl</th><th scope="col">Çoğunluk</th>' +
           '<th scope="col">Evet</th><th scope="col">Hayır</th></tr></thead><tbody>' + satirlar.join("") + "</tbody></table>";
       }
+      // sonucu bilinmeyen il satır olmaz (haritada boş, lejantta sayılır); bilinmeyen değer "—" diye yazılmaz,
+      // bütün illerde boş kalan sütun hiç çizilmez
       const satirlar = IL.iller.slice().sort((a, b) => a.ad.localeCompare(b.ad, "tr"))
-        .filter(il => ilSonuc.get(il.plaka).durum !== "yok")
-        .map(il => { const r = ilSonuc.get(il.plaka);
-          return "<tr><th scope=\"row\">" + M.kacis(il.ad) + "</th><td>" + (r.kazanan ? M.kacis(kisaAd(r.kazanan)) : "—") +
-            (/^seçim tekrarlandı/.test(r.not || "") ? " <small>(seçim tekrarlandı)</small>" : "") +
-            "</td><td>" + M.kacis(r.sira.slice(1, 3).map(s => kisaAd(s.anahtar) + (s.pay != null ? " " + O.yuzdeYaz(s.pay) : "")).join(" · ")) +
-            "</td><td>" + (r.sira[0] && r.sira[0].pay != null ? O.yuzdeYaz(r.sira[0].pay) : r.sira[0] && r.sira[0].oy != null ? O.sayiYaz(r.sira[0].oy) + " oy" : "—") + "</td></tr>"; });
+        .filter(il => ilSonuc.get(il.plaka).durum === "var" && ilSonuc.get(il.plaka).kazanan)
+        .map(il => { const r = ilSonuc.get(il.plaka), ilk = r.sira[0];
+          return { ad: il.ad, birinci: M.kacis(kisaAd(r.kazanan)) + (/^seçim tekrarlandı/.test(r.not || "") ? " <small>(seçim tekrarlandı)</small>" : ""),
+            sonraki: M.kacis(r.sira.slice(1, 3).map(s => kisaAd(s.anahtar) + (s.pay != null ? " " + O.yuzdeYaz(s.pay) : "")).join(" · ")),
+            pay: ilk && ilk.pay != null ? O.yuzdeYaz(ilk.pay) : ilk && ilk.oy != null ? O.sayiYaz(ilk.oy) + " oy" : "" }; });
+      const sonrakiVar = satirlar.some(x => x.sonraki), payVar = satirlar.some(x => x.pay);
       return '<table class="h-tablo"><thead><tr><th scope="col">İl</th><th scope="col">Birinci</th>' +
-        '<th scope="col">Sonrakiler</th><th scope="col">Birincinin payı</th></tr></thead><tbody>' + satirlar.join("") + "</tbody></table>";
+        (sonrakiVar ? '<th scope="col">Sonrakiler</th>' : "") + (payVar ? '<th scope="col">Birincinin payı</th>' : "") + "</tr></thead><tbody>" +
+        satirlar.map(x => '<tr><th scope="row">' + M.kacis(x.ad) + "</th><td>" + x.birinci + "</td>" +
+          (sonrakiVar ? "<td>" + x.sonraki + "</td>" : "") + (payVar ? "<td>" + x.pay + "</td>" : "") + "</tr>").join("") + "</tbody></table>";
     }
 
     return { ilBul, iller, renkler, karistir, ipucu, haritaSVG, lejantHTML, tabloHTML, referandumOzetHTML };

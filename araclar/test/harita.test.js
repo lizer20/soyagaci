@@ -66,7 +66,18 @@ test("SVG: 81 il yolu, ipuçları kaçırılmış, açıklama il sayılarını v
   assert.match(lj, /1 il/);
   assert.match(lj, /sonuç bilinmiyor/);
   assert.match(lj, /o tarihte ayrı il değildi<span>79 il/);
-  assert.match(H.tabloHTML(k, veri), /<th scope="row">Adana<\/th>/);
+  const t = H.tabloHTML(k, veri);
+  assert.match(t, /<th scope="row">Adana<\/th>/);
+  // sonucu bilinmeyen il satır olmaz; hiçbir ilde değeri olmayan sütun çizilmez; "—" yazılmaz
+  assert.doesNotMatch(t, /Hatay|—|Sonrakiler|Birincinin payı/);
+});
+
+test("il tablosu: bilinen pay yazılır, yalnız bazı illerde bilinen değer boş hücre olur", () => {
+  const veri = { iller: { "Adana": { gecerli: 100, oy: { akp: 60, chp92: 40 } }, "Aydın": { kazanan: "chp92" } } };
+  const t = H.tabloHTML({ id: "y", tur: "yerel", tarih: "2000-01-01" }, veri);
+  assert.match(t, /Birincinin payı/);
+  assert.match(t, /%60,0/);
+  assert.doesNotMatch(t, /—/);
 });
 
 test("referandum: evet oranına göre çoğunluk ve renk basamağı", () => {
