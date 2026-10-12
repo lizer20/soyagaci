@@ -4,7 +4,23 @@
 .s-ipucu{max-width:1100px;margin:12px auto 0;font-family:"IBM Plex Mono",monospace;font-size:11px;
   letter-spacing:.04em;color:var(--soluk)}
 
-#rows{max-width:1100px;margin:22px auto 0}
+#rows{max-width:1100px;margin:14px auto 0}
+.banner{scroll-margin-top:48px}
+
+/* dönemlere atlama çubuğu */
+.s-atla{
+  position:sticky;top:0;z-index:20;max-width:1100px;margin:14px auto 0;
+  display:flex;align-items:center;gap:2px;overflow-x:auto;scrollbar-width:none;
+  padding:7px 0;background:rgba(216,218,207,.95);border-bottom:1px solid var(--cizgi);
+  font-family:"IBM Plex Mono",monospace;font-size:11.5px;
+}
+.s-atla::-webkit-scrollbar{display:none}
+.s-atla-et{color:var(--soluk);letter-spacing:.1em;text-transform:uppercase;font-size:10px;margin-right:8px;flex:none}
+.s-atla a{flex:none;color:#3A3E32;text-decoration:none;padding:4px 8px;border:1px solid transparent;white-space:nowrap}
+.s-atla a:hover{border-color:var(--cizgi);color:var(--murekkep)}
+.s-atla a.aktif{background:var(--murekkep);color:var(--kagit)}
+.s-atla a:focus-visible{outline:2px solid var(--murekkep);outline-offset:1px}
+@supports (backdrop-filter:blur(4px)){.s-atla{background:rgba(216,218,207,.85);backdrop-filter:blur(4px)}}
 .s-donem.kapali{display:none}
 .s-donem{padding:2px 0 8px}
 .s-bos{font-size:12.5px;color:var(--soluk);font-style:italic;margin:0 0 14px}
@@ -29,9 +45,9 @@
 .s-kartlar .s-oge{display:flex;min-width:0}
 .s-kartlar .s-oge>.kart{flex:1;min-width:0}
 .s-oge.s-genis{grid-column:span 2}
-/* dar genel seçim kartı (tek partili meclis): çizim üstte, liste altta */
-.s-oge:not(.s-genis) .s-meclis{flex-direction:column;align-items:stretch;gap:8px}
-.s-oge:not(.s-genis) .s-sol{flex:none;width:100%;max-width:230px;margin:0 auto}
+/* dar genel seçim kartı (tek partili meclis): küçük çizim, yanında tek satır */
+.s-oge:not(.s-genis) .s-sol{flex:0 0 132px}
+.s-oge:not(.s-genis) .s-meclis{gap:14px;align-items:center}
 
 .s-kart{padding:10px 14px 12px;display:flex;flex-direction:column}
 .s-ust{
@@ -212,8 +228,8 @@
   .s-yil-no::after{position:static;flex:1;height:0;width:auto;border-radius:0;border-top:1px solid var(--cizgi);
     background:none;box-shadow:none}
   .s-yil-ic{padding-bottom:16px}
-  .s-meclis{flex-direction:column;align-items:stretch;gap:8px}
-  .s-sol{flex:none;width:100%;max-width:260px;margin:0 auto}
+  .s-genis .s-meclis{flex-direction:column;align-items:stretch;gap:8px}
+  .s-genis .s-sol{flex:none;width:100%;max-width:260px;margin:0 auto}
   .t-rozet{font-size:10.5px}
   .s-kunye,.s-sehirler,.s-baskanlik{font-size:12.5px}
   .s-koltuk .s-kb span{font-size:10px}

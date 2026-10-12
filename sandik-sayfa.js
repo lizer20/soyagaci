@@ -55,9 +55,34 @@
     }
     html += yillarHTML(sonra);
     icerik.innerHTML = html;
+    b.id = "bant-" + i;
     rows.appendChild(b); rows.appendChild(icerik);
     O.bantKur(b, icerik);
   });
+
+  /* ---- dönemlere atlama çubuğu (sayfa kayarken üstte kalır; görünen dönem işaretlenir) ---- */
+  const atla = document.getElementById("atla");
+  atla.innerHTML = '<span class="s-atla-et">dönem</span>' + P.DONEMLER.map((d, i) =>
+    '<a href="#bant-' + i + '" data-i="' + i + '" title="' + M.kacis(d.ad) + '">' + d.yil.replace(/\s/g, "") + "</a>").join("");
+  atla.addEventListener("click", e => {
+    const a = e.target.closest("a[data-i]"); if (!a) return;
+    e.preventDefault();   // adres çubuğundaki # seçim kimliği içindir, dönem için değiştirilmez
+    const b = document.getElementById("bant-" + a.dataset.i), s = document.getElementById("donem-" + a.dataset.i);
+    if (s.classList.contains("kapali")) O.bantDurum(b, s, false);
+    b.scrollIntoView({ block: "start" });
+  });
+  if ("IntersectionObserver" in window) {
+    const isaretle = i => atla.querySelectorAll("a").forEach(a => {
+      const aktif = a.dataset.i === String(i);
+      a.classList.toggle("aktif", aktif);
+      // dar ekranda çubuk yatay kayar: işaretli dönem görünür alana getirilir
+      if (aktif && atla.scrollWidth > atla.clientWidth) atla.scrollLeft = a.offsetLeft - (atla.clientWidth - a.offsetWidth) / 2;
+    });
+    const gozcu = new IntersectionObserver(l => {
+      for (const x of l) if (x.isIntersecting) isaretle(x.target.id.replace("donem-", ""));
+    }, { rootMargin: "-45% 0px -50% 0px" });
+    rows.querySelectorAll(".s-donem").forEach(d => gozcu.observe(d));
+  }
 
   /* ---- araç çubuğu ---- */
   const turlar = document.getElementById("turlar");
