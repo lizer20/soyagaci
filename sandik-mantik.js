@@ -204,6 +204,8 @@
       const g = siralaGenel(k).concat(k.sonuc.filter(s => s.ad === BAGIMSIZ))
         .filter(s => s.sandalye > 0)
         .map(s => { const a = partiAdi(s); return { id: a.id, kisa: a.kisa, renk: a.renk, sandalye: s.sandalye, satir: s }; });
+      // seçimde boş kalıp sonradan dolan sandalyeler (k.sonradan) de boş halka olur, ama ayrı açıklanır
+      if (k.sonradan) g.push({ id: null, kisa: "seçimden sonra dolan", renk: null, sandalye: k.sonradan, satir: null, sonradan: true });
       const bilinen = g.reduce((t, x) => t + x.sandalye, 0);
       if (k.meclis != null && k.meclis > bilinen)
         g.push({ id: null, kisa: "dağılımı bilinmeyen", renk: null, sandalye: k.meclis - bilinen, satir: null });
@@ -328,6 +330,7 @@
         const alt = oySirali(k, meclisDurumu(k).giremeyenler)[0];
         const altOy = alt ? oyDegeri(alt, k) : null;
         const kunye = kunyeSatiri([
+          k.sonradan ? O.sayiYaz(k.sonradan) + " sandalye seçimden sonra doldu" : null,
           katilimDegeri(k) != null ? "katılım " + O.yuzdeYaz(katilimDegeri(k)) : null,
           !k.tekParti && k.baraj != null ? "baraj %" + k.baraj : null,
           !k.tekParti && k.baraj != null && alt && altOy != null
@@ -569,10 +572,11 @@
     function meclisFiguru(k) {
       const svg = meclisSVG(k, true);
       if (!svg) return "";
-      const bos = meclisGruplari(k).find(x => !x.renk);
+      const g = meclisGruplari(k), sonra = g.find(x => x.sonradan), bos = g.find(x => !x.renk && !x.sonradan);
       return '<figure class="p-meclis">' + svg + "<figcaption>Her nokta bir sandalye; yerleşim temsilîdir, " +
         "gerçek oturma düzeni değildir. Partiler soldan sağa, tablodaki sırayla dizilidir." + (k.meclis ? " Üstteki çizgi salt çoğunluğu (" +
         O.sayiYaz(Math.floor(k.meclis / 2) + 1) + ") gösterir." : "") +
+        (sonra ? " Boş noktalar: " + O.sayiYaz(sonra.sandalye) + " sandalye seçimde boştu, sonradan dolduruldu (bkz. not)." : "") +
         (bos ? " Boş noktalar: " + O.sayiYaz(bos.sandalye) + " sandalyenin dağılımı kaynaklarda bulunamadı." : "") +
         "</figcaption></figure>";
     }

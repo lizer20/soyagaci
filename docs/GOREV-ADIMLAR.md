@@ -42,6 +42,6 @@ Yapılmayacaklar (şimdilik): 1 (ana sitenin site haritası), 7 (genel başkan l
 - [x] 3 Hükümet penceresi (`hukumetPanelHTML`, adres `#hukumet-57`, numarasızlar `#hukumet-2018-07-09`)
 - [x] 4 Sandık'ta arama (`aramaMetni`/`aramaEslesir`; Türkçe harf sadeleştirme)
 - [x] 5 Hükümette geçen süre (`partiHukumetleriHTML`; kaynakça "süre" maddesi)
-- [ ] 6 İttifak vekil sayıları
-- [ ] 8 Küçük açık kalemler
+- [x] 6 İttifak vekil sayıları — **doldurulamadı**: resmî kaynak yok (TBMM albümü Aralık 2023 üyeliği; Haziran 2023 arşivine erişim yok); değerler boş kaldı, deftere işlendi
+- [x] 8 Küçük açık kalemler — 1931–1943 bağımsızlar **düzeltildi** (TBMM Türk Parlamento Tarihi + Olgun + Baltacı); 2007 MHP/AK Parti tutumu ikinci kaynak yok, yazılmadı
 - [ ] 2 Eski adres yönlendirmesi

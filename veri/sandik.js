@@ -36,9 +36,9 @@ window.SANDIK = {
 
     // kaynak: araclar/kaynak-defteri.md#1931-04-genel
     { id: "1931-04-genel", tur: "genel", tarih: "1931-04-25", tekParti: true,
-      meclis: 317, kayitli: null, kullanilan: null, gecerli: null, baraj: null,
-      sonuc: [ { parti: "chp23", oy: null, sandalye: 317 } ],
-      not: "İkinci seçmenler 7–10 Nisan, milletvekilleri 25 Nisan 1931'de seçildi." },
+      meclis: 317, kayitli: null, kullanilan: null, gecerli: null, baraj: null, sonradan: 10,
+      sonuc: [ { parti: "chp23", oy: null, sandalye: 287 }, { ad: "Bağımsız", oy: null, sandalye: 20 } ],
+      not: "İkinci seçmenler 7–10 Nisan, milletvekilleri 25 Nisan 1931'de seçildi. CHP 30 milletvekilliği için aday göstermeyip bu yerleri bağımsız (müstakil) adaylara bıraktı; bunlardan 20'si bağımsızlarca kazanıldı, seçimde boş kalan 10 sandalye sonradan CHP adaylarıyla dolduruldu." },
 
     // kaynak: araclar/kaynak-defteri.md#1931-05-cb-tbmm
     { id: "1931-05-cb-tbmm", tur: "cb-tbmm", tarih: "1931-05-04",
@@ -55,8 +55,8 @@ window.SANDIK = {
     // kaynak: araclar/kaynak-defteri.md#1935-02-genel
     { id: "1935-02-genel", tur: "genel", tarih: "1935-02-08", tekParti: true,
       meclis: 399, kayitli: null, kullanilan: null, gecerli: null, baraj: null,
-      sonuc: [ { parti: "chp23", oy: null, sandalye: 399 } ],
-      not: null },
+      sonuc: [ { parti: "chp23", oy: null, sandalye: 386 }, { ad: "Bağımsız", oy: null, sandalye: 13 } ],
+      not: "CHP 13 ilde birer milletvekilliği için aday göstermedi; bu yerlerden 13 bağımsız (müstakil) milletvekili seçildi." },
 
     // kaynak: araclar/kaynak-defteri.md#1935-03-cb-tbmm
     { id: "1935-03-cb-tbmm", tur: "cb-tbmm", tarih: "1935-03-01",
@@ -77,9 +77,9 @@ window.SANDIK = {
 
     // kaynak: araclar/kaynak-defteri.md#1939-03-genel
     { id: "1939-03-genel", tur: "genel", tarih: "1939-03-26", tekParti: true,
-      meclis: 429, kayitli: null, kullanilan: null, gecerli: null, baraj: null,
-      sonuc: [ { parti: "chp23", oy: null, sandalye: 429 } ],
-      not: null },
+      meclis: 429, kayitli: null, kullanilan: null, gecerli: null, baraj: null, sonradan: 5,
+      sonuc: [ { parti: "chp23", oy: null, sandalye: 420 }, { ad: "Bağımsız", oy: null, sandalye: 4 } ],
+      not: "Seçimde 424 milletvekili seçildi: CHP Afyonkarahisar, Ankara, Eskişehir ve Niğde'de birer milletvekilliği için aday göstermedi, bu yerlerden 4 bağımsız (müstakil) seçildi. Hatay'ın Türkiye'ye katılmasından sonra seçilen 5 Hatay milletvekiliyle meclis 429 üyeye çıktı." },
 
     // kaynak: araclar/kaynak-defteri.md#1939-04-cb-tbmm
     { id: "1939-04-cb-tbmm", tur: "cb-tbmm", tarih: "1939-04-03",
@@ -96,8 +96,8 @@ window.SANDIK = {
     // kaynak: araclar/kaynak-defteri.md#1943-02-genel
     { id: "1943-02-genel", tur: "genel", tarih: "1943-02-28", tekParti: true,
       meclis: 455, kayitli: null, kullanilan: null, gecerli: null, baraj: null,
-      sonuc: [ { parti: "chp23", oy: null, sandalye: 455 } ],
-      not: "İkinci Dünya Savaşı'nın en yoğun döneminde yapılan, tek parti döneminin son genel seçimidir." },
+      sonuc: [ { parti: "chp23", oy: null, sandalye: 451 }, { ad: "Bağımsız", oy: null, sandalye: 4 } ],
+      not: "İkinci Dünya Savaşı'nın en yoğun döneminde yapılan, tek parti döneminin son genel seçimidir. CHP Afyonkarahisar, Ankara, Eskişehir ve Niğde'de birer milletvekilliği için aday göstermedi; bu yerlerden 4 bağımsız (müstakil) seçildi." },
 
     // kaynak: araclar/kaynak-defteri.md#1943-03-cb-tbmm
     { id: "1943-03-cb-tbmm", tur: "cb-tbmm", tarih: "1943-03-08",

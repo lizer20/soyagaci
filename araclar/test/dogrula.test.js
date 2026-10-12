@@ -201,3 +201,14 @@ test("genel başkanlar: gerçek veri hatasız; bozuk kayıtlar yakalanır", () =
   assert.match(h, /tarih sırasında değil: ap → B/);
   assert.match(dogrulaBaskanlar(P, { akp: [{ ad: "D", bas: "2001", bit: "2014" }] }).uyarilar.join(), /görevdeki genel başkanı yok: akp/);
 });
+
+test("seçimden sonra dolan sandalyeler (sonradan) meclis toplamına katılır; biçimi denetlenir", () => {
+  const S = kopya();
+  const k = bul(S, "1999-04-genel");
+  k.sonuc.find(s => s.parti === "dsp").sandalye = 4;   // 4 + 4 = 8, meclis 10
+  assert.match(hatalar(S), /1999-04-genel: sandalye toplamı 8, meclis 10/);
+  k.sonradan = 2;
+  assert.equal(hatalar(S), "");
+  k.sonradan = 0;
+  assert.match(hatalar(S), /sonradan pozitif tam sayı olmalı/);
+});

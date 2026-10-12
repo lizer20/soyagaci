@@ -427,3 +427,14 @@ test("arama: Türkçe harfler sadeleşir, her sözcük eşleşmeli; kayıt ve h�
   assert.ok(M.aramaEslesir(h, "BULENT"));
   assert.ok(M.aramaEslesir(h, "57. hükümet"));
 });
+
+test("seçimden sonra dolan sandalyeler: boş halka, ayrı açıklama, kart künyesinde", () => {
+  const k = structuredClone(kayit("1999-04-genel"));
+  k.sonuc.find(s => s.parti === "dsp").sandalye = 4; k.sonradan = 2;
+  const g = M.meclisGruplari(k);
+  assert.deepEqual(g.filter(x => !x.renk).map(x => [x.kisa, x.sandalye]), [["seçimden sonra dolan", 2]]);
+  const p = M.panelHTML(k, F).html;
+  assert.match(p, /2 sandalye seçimde boştu, sonradan dolduruldu/);
+  assert.doesNotMatch(p, /dağılımı kaynaklarda bulunamadı/);
+  assert.match(M.kartHTML(k), /2 sandalye seçimden sonra doldu/);
+});

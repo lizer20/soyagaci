@@ -4972,3 +4972,72 @@ Kullanıcı kararı: "her şeyi bitirdikten sonra" genel denetim, ardından kale
    Tuna; Demirel/Çiller), MÇP (Mehmet Pamak/Ali Koç; Türkeş), BDP (Mustafa Ayzit; Demirtaş), DP 2007 ve DEP'te yazan
    isimler kurucu değil öne çıkan liderlerdi; kesin sıra artık "Genel başkanlar" listesinde. (b) DEP genel
    başkanları eklendi (yukarıda).
+
+## Sonraki adımlar turu — kaynak araştırmaları (2026-10-12)
+
+### Tek parti dönemi bağımsız (müstakil) milletvekilleri — 1931, 1935, 1939, 1943 düzeltildi
+
+Önceki kayıtlarda bu dört seçimde bütün sandalyeler CHP'ye yazılmıştı (TÜİK Tablo 1 yalnızca "1 CHP"
+gösterdiği ve Tablo 5 yalnızca toplamı verdiği için). TBMM'nin resmî "Türk Parlamento Tarihi" ciltleri
+CHP'nin bazı illerde aday göstermeyip yerleri bağımsızlara bıraktığını ve bağımsızların seçildiğini
+gösteriyor; kayıtlar buna göre düzeltildi. Toplamlar (`meclis`) değişmedi.
+
+- **[B] TBMM, *Türk Parlamento Tarihi, TBMM IV. Dönem 1931–1935*, C. I** (Fahri Çoker, TBMM 1996;
+  TBMM Açık Erişim `acikerisim.tbmm.gov.tr`, öğe 44c28248-508e-4eca-821a-e753570ec704, dosya 199701402-c1.pdf),
+  s. 42: "C.H.F.'nin gösterdiği (287) aday, listede olduğu gibi seçilmiş, bağımsız olarak adaylığını
+  koyacakların seçilmesi için boş bırakılan seçim çevrelerinden seçilen aşağıda seçim bölgeleri ve adları
+  yazılı (20) milletvekili ile mevcut (307) olmuştur. … (10) milletvekilliği boş kalmıştır" (20 ad tek tek
+  sayılıyor); s. 43: bu 10 yere CHP adaylarıyla ara seçim yapıldı.
+- **[B] aynı dizi, *TBMM V. Dönem 1935–1939*, C. I** (İhsan Güneş, TBMM 2001; öğe 914d0658-…, 200604661-c1.pdf),
+  s. 18: Atatürk'ün 3 Şubat 1935 bildirisi ("Fırka namzed listesinde 16 boş yer bırakmaya karar vermiştir");
+  s. 39: "Berç Keresteciyan TÜRKER (Afyon), Nikola TAPTAS (Ankara), Tayfur SÖKMEN (Antalya), Mustafa Galib
+  ÖNSAY (Çankırı), Şefik TURSAN (Denizli) İstamat Zihni ÖZDAMAR (Eskişehir), Refet BELE (İstanbul), Halil
+  MENTEŞE (İzmir), Nuri TAMAÇ (Kastamonu), Ali Fuat CEBESOY (Konya), Hüsnü KİTAPÇI (Muğla), Abravaya
+  MARMARALI (Niğde), Şükrü BLEDA (Sivas) bağımsız milletvekili olarak seçilmişlerdir" (13 kişi).
+- **[B] aynı dizi, *TBMM VI. Dönem 1939–1943*, C. I** (İsmet Binark, TBMM 2004; öğe def233fe-…, 200405358-c1.pdf),
+  s. 60: "Bu defa intihab olunan 424 mebustan … 420 C.H.P. … 4 Müstakil"; s. 212–213: Hatay'ın katılmasından
+  sonra 5 Hatay milletvekili seçildi (mazbata tasdiki 20.XI.1939); dönem sonu toplamı 429.
+- **[B] aynı dizi, *TBMM VII. Dönem 1943–1946*, C. I** (öğe 6336c461-…, 198907637-c1.pdf), "Müstakiller":
+  "Büyük Millet Meclisinde 4 müstakil Mebus Vardır: Türker (Berç) Afyon Karahisar, Kayaoğlu (Mihal) Ankara,
+  Özdamar (İstamat) Eskişehir, Bodrumlu (Avram Galanti) Niğde".
+- **İkinci kaynak 1:** Kenan OLGUN, "Türkiye'de Cumhuriyetin İlanından 1950'ye Genel Seçim Uygulamaları",
+  *ATAM Dergisi* (`dergipark.org.tr/tr/download/article-file/676405`), s. 15–19: 1931 "CHP'nin ilan ettiği
+  287 aday seçilmiş, bağımsızlara bırakılan 30 milletvekilliğinden ancak 20'si seçilebilmiştir … 10 …
+  milletvekilliği boş kalmıştır"; 1935 "30 olan sayı 16'ya düşürülmüştür … bağımsızların sayısı 13'e
+  düşmüştür", "toplam 399 milletvekilinin katılımıyla açılan TBMM"; 1939 "420'sini CHP 4'ünü de bağımsız
+  milletvekilleri kazanmıştır", "Hatay'ı temsilen seçilen 5 milletvekilinin de katılımıyla milletvekili
+  sayısı 429 olmuştur".
+- **İkinci kaynak 2:** Derya BALTACI, "Tek Parti Dönemi'nde Bağımsız Milletvekilliği Uygulaması ve Türk
+  Siyaseti Üzerindeki Etkisi", *Topkapı Journal of Social Science* 3/1 (2024), s. 49–60
+  (`dergipark.org.tr/tr/download/article-file/3626125`): 1931 "30 milletvekilliği için toplamda 20 bağımsız
+  milletvekili seçimleri kazandı (Cumhuriyet, 26 Nisan 1931)"; 1935 "Meclise giren bu 13 bağımsız
+  milletvekili"; 1939 "bağımsızlara ayrılan kontenjan 4'e düşürüldü"; 1943 "Ankara, Eskişehir, Niğde ve
+  Afyonkarahisar'dan toplamda 4 kontenjan boş bırakıldı … 4 azınlık bağımsız aday seçilerek meclise girmeyi
+  başardılar (Vakit, 1 Mart 1943)".
+- **Yazılanlar:** 1931 CHP 287, Bağımsız 20, `sonradan: 10` (seçimde boş kalıp sonradan dolan); 1935 CHP 386
+  (399 − 13), Bağımsız 13; 1939 CHP 420, Bağımsız 4, `sonradan: 5` (Hatay); 1943 CHP 451 (455 − 4),
+  Bağımsız 4. Her kayda kısa `not` eklendi. Yeni `sonradan` alanı `dogrula.js`'te meclis toplamına katılır;
+  arayüzde boş halka olarak çizilir ve "seçimde boştu, sonradan dolduruldu" diye açıklanır.
+- Uyuşmazlık: yok. (TBMM IV. Dönem cildi 1931 seçim gününü "24 Nisan" yazıyor; TÜİK ve Olgun "25 Nisan";
+  kayıttaki tarih değiştirilmedi.)
+- Erişim: 2026-10-12.
+
+### 2018/2023 ittifak listelerinden seçilen vekil sayıları — yine `null`
+
+- Aranan: CHP (2023) ve İYİ Parti (2018) listelerinden seçilen DEVA, Gelecek, Saadet, DP vekillerinin ve AK Parti
+  listesinden seçilen HÜDA PAR vekillerinin sayısı için resmî bir kaynak.
+- **TBMM 28. Dönem Albümü** (`cdn.tbmm.gov.tr/TbmmWeb/Albumler/Mv_Albumu/28_donem_mv_album.pdf`, Aralık 2023):
+  "21 Aralık 2023 tarihi itibarıyla" parti dağılımı (DEVA 15, Saadet 20, HÜDA PAR 4, DP 3; Gelecek Partisi
+  satırı yok). Bu, seçim sonucundaki liste dağılımı değil, aralık 2023'teki üyelik dağılımıdır (Gelecek
+  vekilleri o tarihte Saadet'te görünüyor); seçim anındaki sayıyı vermiyor.
+- TBMM'nin "Sandalye Dağılımı" sayfasının Haziran 2023 kopyası Internet Archive'da var
+  (`web.archive.org/web/20230605153742/https://www.tbmm.gov.tr/sandalyedagilimi`) ama web.archive.org bu
+  çalışma ortamından açılmıyor (bağlantı sıfırlanıyor).
+- Sonuç: tek ajans haberine (AA) dayanan sayılar ve sonraki tarihli üyelik tablosu iki kaynak kuralını
+  karşılamadığı için değerler `null` kaldı.
+
+### 2007 referandumu — MHP "hayır" ve AK Parti "evet" yine yazılmadı
+
+- Bu turda da taranan: TESAV "21 Ekim 2007 Referandumunun Değerlendirilmesi" ve "21 Ekim 2007 Tarihli
+  Halkoylaması" (parti tutumu yok), Yeni Şafak "Halkın demokrasi dersi: 2007 anayasa referandumu" (parti
+  tutumu yok), dergipark ve haber aramaları. Bağımsız ikinci kaynak bulunamadı; iki tutum tek kaynaklı kaldı.

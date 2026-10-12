@@ -76,9 +76,12 @@ function dogrulaSandik(P, S) {
       secmenDenetle(k, k);
       satirlariDenetle(k, k.sonuc || [], k.gecerli);
     }
+    // sonradan: seçimde boş kalıp sonradan (ara seçimle) dolan sandalyeler; toplama katılır
+    if (k.sonradan != null && !(Number.isInteger(k.sonradan) && k.sonradan > 0))
+      hatalar.push(k.id + ": sonradan pozitif tam sayı olmalı");
     if (k.tur === "genel" && k.meclis != null) {
       const bilinen = (k.sonuc || []).filter(s => s.sandalye != null);
-      const t = bilinen.reduce((a, s) => a + s.sandalye, 0);
+      const t = bilinen.reduce((a, s) => a + s.sandalye, 0) + (k.sonradan || 0);
       if (t > k.meclis || (bilinen.length === k.sonuc.length && t !== k.meclis))
         hatalar.push(k.id + ": sandalye toplamı " + t + ", meclis " + k.meclis);
     }

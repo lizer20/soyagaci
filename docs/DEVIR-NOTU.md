@@ -413,12 +413,14 @@ diyor; bu 15, Millet Meclisi (14) + Cumhuriyet Senatosu (1) toplamı. Sandık ve
   OCR yok. (Denendi: RG mükerrer sayısının `<img>` etiketleri, `GIF image data` doğrulaması,
   YSK karar arama sayfası HTML hata döndürüyor.)
 - ◐ **2007 referandumunun `tutumlar` alanı**: CHP hayır eklendi; MHP (hayır) ve AK Parti (evet) tek kaynaklı kaldı
+  (12.10.2026'da yeniden arandı, ikinci kaynak yine yok)
 - ✅ (26.09.2026: resmî YSK ülke toplamları RG'den siteye yazıldı — kullanıcı kararı: resmî ilan yeterli; 27.09.2026'da 2004–2024 de yazıldı) 1984/1989/1994/1999 **yerel seçimlerin ülke geneli belediye meclisi sayıları** `null` —
   TÜİK bu ölçüyü ulusal düzeyde yayımlamıyor, YSK'nın Resmî Gazete ilanı ise `curl` ile
   açılamadı, tarayıcı dosyayı indirmeye çalışıyor. **Bu yol bir daha denenebilir.**
 - ◐ 27.09.2026: 1961 ve 1969 geçerli oy eklendi; 1950 sandalye çelişkisi (DP 408/416, bağımsız 9/1) bulundu → bağımsız `null`; 1950–57 geçerli oy resmî kaynakta yok.
-- 1931–1943 tek parti seçimlerinde bağımsız milletvekili olup olmadığı (TÜİK'e göre yok;
-  bir kez daha bakılacak)
+- ✅ 1931–1943 tek parti seçimlerinde bağımsız milletvekili (12.10.2026: vardı — TBMM *Türk Parlamento Tarihi*
+  IV–VII. dönem ciltleri + Olgun + Baltacı; 1931 CHP 287/bağımsız 20/sonradan 10, 1935 386/13, 1939 420/4/sonradan 5,
+  1943 451/4; bkz. kaynak defteri "Sonraki adımlar turu")
 - ✅ 64. Hükümet `bitisNedeni: istifa`
 - ✅ 1973/1977 yerel `buyuksehir` (27.09.2026: DİE kitaplarından, üçü de CHP); 1963 ve 1968 ülke geneli belediye meclisi eklendi
 
