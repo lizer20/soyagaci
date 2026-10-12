@@ -36,8 +36,8 @@ Bu dosya, projenin bir sohbetten başka bir sohbete aktarılması için yazıld�
 
 > **Güncelleme (12 Ekim 2026) — görünüm ve okunabilirlik turu:** kullanıcı isteği ve yapılanların
 > tamamı `docs/GOREV-GORUNUM.md`'de. Sandık yeni düzende (yıl çizelgesi, hizalı satırlar, boş veri
-> gizli); yazı tipleri inceltildi; harita verisi sonradan yükleniyor. **Dalda bekliyor, `main`'e
-> kullanıcı onayından sonra alınacak.** Testler 93/93.
+> gizli); yazı tipleri inceltildi; harita verisi sonradan yükleniyor. Kullanıcı onayladı, `main`'e
+> alındı ve yayınlandı. Testler 93/93.
 
 ---
 

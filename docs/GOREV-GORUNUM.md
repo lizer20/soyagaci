@@ -38,9 +38,8 @@
       penceresi ve 40 harita tablosunda "—"/"?" yok, file:// üzerinde konsol hatası yok)
 - [x] 7. Değişiklik listesi kullanıcıya (aşağıda)
 
-**Durum (12 Ekim 2026):** her şey `claude/elegant-tesla-uaepdv` dalında; **`main`'e alınmadı**.
-Kullanıcı onay verince: `git push origin HEAD:main` (yayın). Onay öncesi önizleme için dal
-indirilip `index.html` / `sandik.html` çift tıklamayla açılabilir.
+**Durum (12 Ekim 2026):** kullanıcı baktı ve onayladı ("baktım güzel olmuş yayınla"); `main`'e
+alındı ve yayınlandı. Görev kapandı.
 
 ## Değişiklik listesi (kullanıcıya verilen)
 
