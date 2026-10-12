@@ -76,6 +76,7 @@ NODE_PATH=$(npm root -g) node araclar/denetim/site.js
 | `araclar/dogrula.js`, `araclar/topla.js`, `araclar/yukle.js` | Denetleyici, il toplayıcı, Node yükleyicisi |
 | `araclar/denetim/` | Tarayıcıda site denetimi (`site.js`) ve sahte veriyle Sandık sınaması |
 | `araclar/font-incelt.py` | `ortak.css`'teki gömülü yazı tiplerini inceltme betiği |
+| `araclar/eski-adres/` | Eski adresi (`/turkiye_siyasi_partiler_soyagaci/`) yeni adrese yönlendiren sayfalar ve kurulum notu |
 | `araclar/test/` | Birim testleri (`fikstur.js` sahte veridir, siteye girmez) |
 | `docs/superpowers/` | Spesifikasyon ve uygulama planı |
 | `docs/DEVIR-NOTU.md` | İşin bugüne kadarki durumu, kullanıcı kararları ve açık işler |
