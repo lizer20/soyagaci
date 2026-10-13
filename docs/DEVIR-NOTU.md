@@ -46,6 +46,16 @@ Bu dosya, projenin bir sohbetten başka bir sohbete aktarılması için yazıld�
 > (müstakil) milletvekilleri ve yeni `sonradan` alanı. İttifak vekil sayıları ve 2007 MHP/AK Parti tutumu kaynaksız
 > kaldı. Eski adres yönlendirmesi `lizer20.github.io` deposuna `turkiye_siyasi_partiler_soyagaci/` klasörü olarak eklendi (kaynak: `araclar/eski-adres/`).
 > Depo artık `lizer20/soyagaci` (yerel `origin` bu adla). Testler 99/99.
+>
+> **Güncelleme (13 Ekim 2026) — deneme deposu turu (`lizer20/soytest`):** geliştirmeler önce deneme deposunda
+> (https://emrebiltekin.me/soytest/, arama motorlarına kapalı) yapıldı, kullanıcı baktı ve onayladı ("baktım güzel
+> olmuş asıl siteye yayınla"); `noindex` dışındaki bütün commit'ler buraya aynen alındı. Ayrıntı ve değişiklik
+> listesi `docs/GOREV-SOYTEST.md`'de. Özet: her sayfada hızlı arama (`arayuz.js`, `/` ya da Ctrl+K) ve başa dön;
+> pencerelerde önceki / sonraki (← →), bağlantı kopyalama, telefonda aşağı çekip kapatma; soyağacında **liste
+> görünümü** (`index.html?gorunum=liste`); Sandık dönem özetleri; haritada ← → ve renk geçişi; temizlik. Soyağacı
+> şemasında **çizgiler artık kartların arkasından geçmiyor ve üst üste binmiyor** (sütun aralarında şeritler, aralık
+> boyamayla dağıtılır; `index.html` → `ciz()`). Gelecekte yeni bir deneme turu gerekirse aynı yöntem: deneme deposuna
+> kopya, ayrı commit'ler, onaylananlar `git cherry-pick` ile. Testler 101/101.
 
 ---
 

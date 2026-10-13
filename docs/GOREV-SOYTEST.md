@@ -58,6 +58,12 @@
 - [x] 12 gereksiz kod taraması (`13cbbad`) ve açılış hafifletme (`519ca05`)
 - [x] 13 son denetim (101 birim testi, `dogrula`, `site.js`, GitHub Actions yeşil) ve değişiklik listesi (aşağıda)
 
+## Yayın
+
+**13 Ekim 2026:** kullanıcı deneme sitesine baktı ve onayladı ("baktım güzel olmuş asıl siteye yayınla").
+`afc7ee8` (noindex) dışındaki bütün commit'ler `git cherry-pick` ile asıl depoya (`lizer20/soyagaci`) alındı ve
+`main`'e gönderildi. Deneme deposu yerinde duruyor; bir sonraki deneme turunda yeniden kullanılabilir.
+
 ## Sabah için değişiklik listesi
 
 Deneme sitesi: **https://emrebiltekin.me/soytest/** (arama motorlarına kapalı). Asıl siteye hiçbir şey gönderilmedi.
